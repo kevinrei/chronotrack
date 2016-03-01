@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    int[] iconArray = { android.R.drawable.ic_input_add, android.R.drawable.ic_menu_today, android.R.drawable.ic_dialog_alert };
+    int currentTab = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,16 +54,38 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setOnTabSelectedListener(
+                new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        super.onTabSelected(tab);
+                        currentTab = tab.getPosition();
+                        fab.setImageResource(iconArray[currentTab]);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+                        fab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (currentTab == 0) {
+                                    Snackbar.make(view, "Add Game", Snackbar.LENGTH_SHORT)
+                                            .setAction("Action", null).show();
+                                }
+
+                                else if (currentTab == 1) {
+                                    Snackbar.make(view, "Add Stamina Alarm", Snackbar.LENGTH_SHORT)
+                                            .setAction("Action", null).show();
+                                }
+
+                                else if (currentTab == 2) {
+                                    Snackbar.make(view, "Add Build Reminder", Snackbar.LENGTH_SHORT)
+                                            .setAction("Action", null).show();
+                                }
+                            }
+                        });
+                    }
         });
 
     }
@@ -150,11 +175,13 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "Games";
                 case 1:
-                    return "SECTION 2";
+                    // Countdown: remind me in x time
+                    return "Countdown";
                 case 2:
-                    return "SECTION 3";
+                    // Condition: remind me when x time reached
+                    return "Condition";
             }
             return null;
         }
