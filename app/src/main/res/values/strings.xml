@@ -1,13 +1,17 @@
 <resources>
+
     <!-- App -->
     <string name="app_name">ChronoTrack</string>
 
     <!-- Menu -->
+    <string name="action_about">About</string>
     <string name="action_settings">Settings</string>
 
     <!-- FAB Menu -->
     <string name="action_add_installed">Add Installed Game</string>
-    <string name="action_add_uninstalled">Add Game Not On Phone</string>
+    <string name="action_add_uninstalled">Add Game Not On Device</string>
 
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="games_list">This is a list of games.</string>
+    <string name="alarms_list">This is a list of alarms.</string>
+
 </resources>

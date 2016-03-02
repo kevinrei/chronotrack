@@ -1,8 +1,8 @@
 package com.kevinrei.chronotrack;
 
 import android.support.design.internal.NavigationMenu;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -10,38 +10,21 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    /** ViewPager */
     private ViewPager mViewPager;
-
-    int currentTab = 0;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private CoordinatorLayout mMainContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +33,15 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mMainContent = (CoordinatorLayout) findViewById(R.id.main_content);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Fab speed dial with options to add from installed apps or add a new game
         final FabSpeedDial fabSpeedDial = (FabSpeedDial) findViewById(R.id.fab_speed_dial);
         fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
             @Override
@@ -67,11 +50,28 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean onMenuItemSelected(MenuItem menuItem) {
-                return false;
+            public boolean onMenuItemSelected(MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.action_add_installed) {
+                    Snackbar.make(mMainContent,
+                            getString(R.string.action_add_installed),
+                            Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                else if (id == R.id.action_add_uninstalled) {
+                    Snackbar.make(mMainContent,
+                            getString(R.string.action_add_uninstalled),
+                            Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                return true;
             }
         });
 
+        // Set up the TabLayout.  Only show the FAB on Games tab.
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setOnTabSelectedListener(
@@ -79,9 +79,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
-                        currentTab = tab.getPosition();
 
-                        if (currentTab == 0) {
+                        if (tab.getPosition() == 0) {
                             fabSpeedDial.setVisibility(View.VISIBLE);
                         }
 
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -116,10 +114,19 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
+        }
+    }
+
+
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
+     * FragmentStatePagerAdapter
+     * */
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -129,8 +136,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            if (position == 0) {
+                return new GameListFragment();
+            }
+
+            else {
+                return new AlarmListFragment();
+            }
         }
 
         @Override
