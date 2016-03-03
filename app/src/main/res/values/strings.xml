@@ -1,7 +1,8 @@
 <resources>
 
-    <!-- App -->
+    <!-- App Labels -->
     <string name="app_name">ChronoTrack</string>
+    <string name="new_game_activity">Add New Game</string>
 
     <!-- Menu -->
     <string name="action_about">About</string>
@@ -13,5 +14,14 @@
 
     <string name="games_list">This is a list of games.</string>
     <string name="alarms_list">This is a list of alarms.</string>
+
+    <!-- Add New Game -->
+    <string name="label_title">Game Title</string>
+    <string name="hint_title">Enter Game Title</string>
+    <string name="label_unit">Stamina Unit</string>
+    <string name="hint_unit">Enter Unit (e.g. Stamina, Heart, Key)</string>
+    <string name="label_rate">Stamina Recovery Rate</string>
+    <string name="label_max">Maximum Stamina Value</string>
+    <string name="hint_max">Enter Maximum Stamina Value</string>
 
 </resources>

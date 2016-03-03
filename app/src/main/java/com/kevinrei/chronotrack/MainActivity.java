@@ -1,5 +1,6 @@
 package com.kevinrei.chronotrack;
 
+import android.content.Intent;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
@@ -61,9 +62,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 else if (id == R.id.action_add_uninstalled) {
-                    Snackbar.make(mMainContent,
-                            getString(R.string.action_add_uninstalled),
-                            Snackbar.LENGTH_SHORT).show();
+                    Intent newGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
+                    startActivity(newGameIntent);
                     return true;
                 }
 
@@ -105,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        if (id == R.id.action_about) {
+            return true;
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
