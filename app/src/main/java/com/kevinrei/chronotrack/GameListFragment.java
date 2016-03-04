@@ -3,7 +3,6 @@ package com.kevinrei.chronotrack;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +14,10 @@ import java.util.List;
 public class GameListFragment extends Fragment {
 
     private static final String TAG = "GameListFragment";
-    private MySQLiteHelper db;
+    private static final int HORIZONTAL_MARGIN = 72;
+    private static final int VERTICAL_MARGIN = 108;
 
+    protected MySQLiteHelper db;
     protected RecyclerView mRecyclerView;
     protected GameAdapter mGameAdapter;
     protected List<Game> games;
@@ -36,9 +37,11 @@ public class GameListFragment extends Fragment {
         games = db.getAllGames();
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
         mGameAdapter = new GameAdapter(games);
         mRecyclerView.setAdapter(mGameAdapter);
@@ -52,6 +55,27 @@ public class GameListFragment extends Fragment {
             mRecyclerView.setVisibility(View.GONE);
         } else {
             mRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+        private int horizontalMargin;
+        private int verticalMargin;
+
+        public SpacesItemDecoration(int horizontalMargin, int verticalMargin) {
+            this.horizontalMargin = horizontalMargin;
+            this.verticalMargin = verticalMargin;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            outRect.left = horizontalMargin;
+            outRect.right = horizontalMargin;
+            outRect.bottom = verticalMargin;
+
+            // Add top margin only for the first item to avoid double space between items
+            if(parent.getChildAdapterPosition(view) == 0)
+                outRect.top = verticalMargin - 48;
         }
     }
 }

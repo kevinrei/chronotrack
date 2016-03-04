@@ -29,5 +29,4 @@ dependencies {
     compile 'com.android.support:design:23.2.0'
     compile 'com.android.support:recyclerview-v7:23.2.0'
     compile 'io.github.yavski:fab-speed-dial:1.0.3'
-    compile 'io.realm:realm-android:0.87.5'
 }
