@@ -6,22 +6,34 @@
 
     <!-- Menu -->
     <string name="action_about">About</string>
+    <string name="action_save">Save</string>
     <string name="action_settings">Settings</string>
 
     <!-- FAB Menu -->
     <string name="action_add_installed">Add Installed Game</string>
     <string name="action_add_uninstalled">Add Game Not On Device</string>
 
-    <string name="games_list">This is a list of games.</string>
-    <string name="alarms_list">This is a list of alarms.</string>
-
     <!-- Add New Game -->
-    <string name="label_title">Game Title</string>
+    <string name="label_title">* Game Title</string>
     <string name="hint_title">Enter Game Title</string>
     <string name="label_unit">Stamina Unit</string>
     <string name="hint_unit">Enter Unit (e.g. Stamina, Heart, Key)</string>
-    <string name="label_rate">Stamina Recovery Rate</string>
-    <string name="label_max">Maximum Stamina Value</string>
+    <string name="label_rate">* Stamina Recovery Rate</string>
+    <string name="label_max">* Maximum Stamina Value</string>
     <string name="hint_max">Enter Maximum Stamina Value</string>
+    <string name="required">* indicates required fields.</string>
+    <string name="unfilled_title">The title is missing.</string>
+    <string name="unfilled_rate">The recovery rate is not specified.</string>
+    <string name="unfilled_max">The maximum stamina value is not filled.</string>
+
+    <!-- Game List Item -->
+    <string name="game_title">Game Title</string>
+    <string name="game_rate">Recovery rate: 1 Unit / Rate</string>
+    <string name="game_max">Maximum stamina value:</string>
+
+
+
+    <string name="games_list">This is a list of games.</string>
+    <string name="alarms_list">This is a list of alarms.</string>
 
 </resources>

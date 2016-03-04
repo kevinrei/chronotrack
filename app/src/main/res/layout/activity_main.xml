@@ -51,7 +51,7 @@
         app:fabMenu="@menu/menu_fab"
         app:miniFabBackgroundTint="@android:color/white"
         app:miniFabDrawableTint="?attr/colorPrimaryDark"
-        app:miniFabTitleTextColor="?attr/colorPrimaryDark"/>
+        app:miniFabTitleTextColor="?attr/colorPrimaryDark" />
 
 
 </android.support.design.widget.CoordinatorLayout>

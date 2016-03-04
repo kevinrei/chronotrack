@@ -1,13 +1,15 @@
 package com.kevinrei.chronotrack;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.LinkedList;
-import java.util.List;
+        import android.content.ContentValues;
+        import android.content.Context;
+        import android.database.Cursor;
+        import android.database.sqlite.SQLiteDatabase;
+        import android.database.sqlite.SQLiteOpenHelper;
+
+        import java.util.LinkedList;
+        import java.util.List;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
@@ -29,8 +31,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             KEY_RECOVERY_RATE,
             KEY_MAX_STAMINA
     };
-
-    private String query;
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -120,9 +120,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public List<Game> getAllGames() {
         List<Game> gameList = new LinkedList<>();
 
+        String query;
+
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.query(TABLE_GAMES, null, null, null, null, null, null);
 
         // Go over each row, build the row and add it to the list
         Game game;

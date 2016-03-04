@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -25,18 +26,18 @@ public class MainActivity extends AppCompatActivity {
     /** ViewPager */
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private CoordinatorLayout mMainContent;
+    private View parent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        parent = findViewById(R.id.main_content);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mMainContent = (CoordinatorLayout) findViewById(R.id.main_content);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -55,9 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
 
                 if (id == R.id.action_add_installed) {
-                    Snackbar.make(mMainContent,
-                            getString(R.string.action_add_installed),
-                            Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parent, getString(R.string.action_add_installed), Snackbar.LENGTH_SHORT).show();
                     return true;
                 }
 
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
         });
-
     }
 
     @Override

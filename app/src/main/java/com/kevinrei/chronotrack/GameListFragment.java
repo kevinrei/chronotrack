@@ -1,27 +1,29 @@
 package com.kevinrei.chronotrack;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 public class GameListFragment extends Fragment {
 
     private static final String TAG = "GameListFragment";
-    private static final int DATASET_COUNT = 60;
+    private MySQLiteHelper db;
 
     protected RecyclerView mRecyclerView;
     protected GameAdapter mGameAdapter;
-    protected RecyclerView.LayoutManager mLayoutManager;
-    protected String[] mDataSet;
+    protected List<Game> games;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initDataSet();
     }
 
     @Override
@@ -30,31 +32,26 @@ public class GameListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_games_list, container, false);
         rootView.setTag(TAG);
 
+        db = new MySQLiteHelper(getActivity());
+        games = db.getAllGames();
+
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-
-        mGameAdapter = new GameAdapter(mDataSet);
+        mGameAdapter = new GameAdapter(games);
         mRecyclerView.setAdapter(mGameAdapter);
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        checkGameList();
 
         return rootView;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-
-        // Refresh recycler view here
-
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    private void initDataSet() {
-        mDataSet = new String[DATASET_COUNT];
-        for (int i = 0; i < DATASET_COUNT; i++) {
-            mDataSet[i] = "This is element #" + i;
+    private void checkGameList() {
+        if (mGameAdapter.getItemCount() == 0) {
+            mRecyclerView.setVisibility(View.GONE);
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -34,10 +34,10 @@ public class Game {
     public int getRecoveryRate() { return recoveryRate; }
     public int getMaxStamina() { return maxStamina; }
 
-    public void setId(int new_id) { id = new_id; }
-    public void setTitle(String new_title) { title = new_title; }
-    public void setUnit(String new_unit) { unit = new_unit; }
-    public void setRecoveryRate(int new_recoveryRate) { recoveryRate = new_recoveryRate; }
-    public void setMaxStamina(int new_maxStamina) { maxStamina = new_maxStamina; }
+    public void setId(int id) { this.id = id; }
+    public void setTitle(String title) { this.title = title; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public void setRecoveryRate(int recoveryRate) { this.recoveryRate = recoveryRate; }
+    public void setMaxStamina(int maxStamina) { this.maxStamina = maxStamina; }
 }
 
