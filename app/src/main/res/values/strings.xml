@@ -14,17 +14,14 @@
     <string name="action_add_uninstalled">Add Game Not On Device</string>
 
     <!-- Add New Game -->
-    <string name="label_title">* Game Title</string>
-    <string name="hint_title">Enter Game Title</string>
-    <string name="label_unit">Stamina Unit</string>
-    <string name="hint_unit">Enter Unit (e.g. Stamina, Heart, Key)</string>
-    <string name="label_rate">* Stamina Recovery Rate</string>
-    <string name="label_max">* Maximum Stamina Value</string>
-    <string name="hint_max">Enter Maximum Stamina Value</string>
-    <string name="required">* indicates required fields.</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_unit">Unit (e.g. Energy, Hearts, Keys)</string>
+    <string name="hint_max">Maximum Stamina Value</string>
     <string name="unfilled_title">The title is missing.</string>
     <string name="unfilled_rate">The recovery rate is not specified.</string>
     <string name="unfilled_max">The maximum stamina value is not filled.</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
     <!-- Game List Item -->
     <string name="game_title">Game Title</string>

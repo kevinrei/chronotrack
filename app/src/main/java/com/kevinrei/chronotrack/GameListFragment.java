@@ -45,17 +45,8 @@ public class GameListFragment extends Fragment {
 
         mGameAdapter = new GameAdapter(games);
         mRecyclerView.setAdapter(mGameAdapter);
-        checkGameList();
 
         return rootView;
-    }
-
-    private void checkGameList() {
-        if (mGameAdapter.getItemCount() == 0) {
-            mRecyclerView.setVisibility(View.GONE);
-        } else {
-            mRecyclerView.setVisibility(View.VISIBLE);
-        }
     }
 
     public class SpacesItemDecoration extends RecyclerView.ItemDecoration {

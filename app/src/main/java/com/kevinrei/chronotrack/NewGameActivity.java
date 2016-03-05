@@ -41,7 +41,7 @@ public class NewGameActivity extends AppCompatActivity {
 
         mTitle = (EditText) findViewById(R.id.hint_title);
         mUnit = (EditText) findViewById(R.id.hint_unit);
-        mRecovery = (Spinner) findViewById(R.id.spinner_rate);
+        mRecovery = (Spinner) findViewById(R.id.spn_rate);
         mStamina = (EditText) findViewById(R.id.hint_max);
 
         ArrayAdapter<CharSequence> rateAdapter = ArrayAdapter.createFromResource(
