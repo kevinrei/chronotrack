@@ -1,5 +1,7 @@
 package com.kevinrei.chronotrack;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,6 +64,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return games.size();
+    }
+
+    public static void createDeleteDialog(int position) {
+
     }
 
 /*    public String getRateString(String unit, int rate) {

@@ -26,6 +26,15 @@
     <!-- Game List Item -->
     <string name="game_title">Title</string>
     <string name="game_category">Category</string>
+    <string name="delete_confirm">Are you sure you want to delete this game?</string>
+
+    <!-- Change Image Dialog -->
+    <string name="msg_select_ext">Select an image from external storage:</string>
+    <string name="btn_select">Select...</string>
+    <string name="msg_no_ext">No external photo selected</string>
+    <string name="or">or</string>
+    <string name="msg_url">Insert an image URL:</string>
+    <string name="hint_url">Paste URL here</string>
 
 
 
