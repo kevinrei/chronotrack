@@ -15,11 +15,13 @@
 
     <!-- Add New Game -->
     <string name="hint_title">Title</string>
+    <string name="btn_change">Change</string>
+    <string name="lbl_category">Category</string>
     <string name="hint_unit">Unit (e.g. Energy, Hearts, Keys)</string>
+    <string name="lbl_rate">Recovery Rate</string>
     <string name="hint_max">Maximum Stamina Value</string>
     <string name="unfilled_title">The title is missing.</string>
-    <string name="unfilled_rate">The recovery rate is not specified.</string>
-    <string name="unfilled_max">The maximum stamina value is not filled.</string>
+    <string name="invalid_max">The MAX value must be &gt;= 0 and &lt;= 999.</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
 
@@ -27,16 +29,6 @@
     <string name="game_title">Title</string>
     <string name="game_category">Category</string>
     <string name="delete_confirm">Are you sure you want to delete this game?</string>
-
-    <!-- Change Image Dialog -->
-    <string name="msg_select_ext">Select an image from external storage:</string>
-    <string name="btn_select">Select...</string>
-    <string name="msg_no_ext">No external photo selected</string>
-    <string name="or">or</string>
-    <string name="msg_url">Insert an image URL:</string>
-    <string name="hint_url">Paste URL here</string>
-
-
 
 
 

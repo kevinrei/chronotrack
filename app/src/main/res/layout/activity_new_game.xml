@@ -21,8 +21,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:title="@string/new_game_activity"
             android:background="?attr/colorPrimary"
+            app:title="@string/new_game_activity"
             app:popupTheme="@style/AppTheme.PopupOverlay" >
 
         </android.support.v7.widget.Toolbar>
@@ -44,22 +44,41 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin">
 
+
             <ImageView
                 android:id="@+id/img_game"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginStart="@dimen/margin_medium"
+                android:layout_gravity="center"
                 android:src="@mipmap/ic_launcher"
                 android:contentDescription="@string/game_title"/>
 
-            <Spinner
-                android:id="@+id/spn_category"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_centerVertical="true" >
+
+                <TextView
+                    android:id="@+id/lbl_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/spn_category"
+                    android:layout_alignStart="@+id/spn_category"
+                    android:text="@string/lbl_category"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <Spinner
+                    android:id="@+id/spn_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/lbl_category" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
@@ -83,12 +102,30 @@
                 android:layout_marginBottom="@dimen/spacing"
                 android:hint="@string/hint_unit" />
 
-            <Spinner
-                android:id="@+id/spn_rate"
-                android:layout_width="match_parent"
+            <RelativeLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing"
-                android:layout_marginBottom="@dimen/spacing"/>
+                android:layout_centerVertical="true" >
+
+                <TextView
+                    android:id="@+id/lbl_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/spn_rate"
+                    android:layout_alignStart="@+id/spn_rate"
+                    android:layout_marginTop="@dimen/spacing"
+                    android:text="@string/lbl_rate"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <Spinner
+                    android:id="@+id/spn_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing"
+                    android:layout_marginBottom="@dimen/spacing"
+                    android:layout_below="@+id/lbl_rate"/>
+
+            </RelativeLayout>
 
             <EditText
                 android:id="@+id/hint_max"
