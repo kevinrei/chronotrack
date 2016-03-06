@@ -17,6 +17,8 @@ public class NewGameActivity extends AppCompatActivity {
 
     /** Data Values */
     String gameTitle;
+    // String gameImage;
+    String gameCategory;
     String staminaUnit;
     int recoveryRate;
     int maxStamina;
@@ -24,6 +26,8 @@ public class NewGameActivity extends AppCompatActivity {
     /** Widgets and Fields */
     View parent;
     EditText mTitle;
+    // ImageView mImage;
+    Spinner mCategory;
     EditText mUnit;
     Spinner mRecovery;
     EditText mStamina;
@@ -40,9 +44,16 @@ public class NewGameActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mTitle = (EditText) findViewById(R.id.hint_title);
+        // mImage = (ImageView) findViewById(R.id.img_game);
+        mCategory = (Spinner) findViewById(R.id.spn_category);
         mUnit = (EditText) findViewById(R.id.hint_unit);
         mRecovery = (Spinner) findViewById(R.id.spn_rate);
         mStamina = (EditText) findViewById(R.id.hint_max);
+
+        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
+                this, R.array.category_array, android.R.layout.simple_spinner_item);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mCategory.setAdapter(categoryAdapter);
 
         ArrayAdapter<CharSequence> rateAdapter = ArrayAdapter.createFromResource(
                 this, R.array.recovery_rate_array, android.R.layout.simple_spinner_item);
@@ -98,6 +109,11 @@ public class NewGameActivity extends AppCompatActivity {
         // Title
         gameTitle = mTitle.getText().toString();
 
+        // Image
+
+        // Category
+        gameCategory = mCategory.getSelectedItem().toString();
+
         // Unit
         if (isEmpty(mUnit)) {
             staminaUnit = "Stamina";
@@ -113,7 +129,10 @@ public class NewGameActivity extends AppCompatActivity {
 
         Game game = new Game();
 
+        // game.setImage(gameImage);
         game.setTitle(gameTitle);
+        // game.setImage(gameImage);
+        game.setCategory(gameCategory);
         game.setUnit(staminaUnit);
         game.setRecoveryRate(recoveryRate);
         game.setMaxStamina(maxStamina);

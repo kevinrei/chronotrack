@@ -21,6 +21,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:title="@string/new_game_activity"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" >
 
@@ -37,17 +38,16 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         style="@style/Margin" >
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/layout_game"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
 
             <ImageView
-                android:id="@+id/icon_game"
+                android:id="@+id/img_game"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:layout_marginBottom="@dimen/margin_medium"
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginStart="@dimen/margin_medium"
                 android:src="@mipmap/ic_launcher"
@@ -55,38 +55,49 @@
 
             <Spinner
                 android:id="@+id/spn_category"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/spacing"
-                android:layout_marginStart="@dimen/spacing"
-                android:layout_gravity="end"/>
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <EditText
             android:id="@+id/hint_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing"
             android:hint="@string/hint_title" />
-
-        <EditText
-            android:id="@+id/hint_unit"
+        
+        <LinearLayout
+            android:id="@+id/layout_mobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_unit" />
+            android:orientation="vertical" >
 
-        <Spinner
-            android:id="@+id/spn_rate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing" />
+            <EditText
+                android:id="@+id/hint_unit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing"
+                android:hint="@string/hint_unit" />
 
-        <EditText
-            android:id="@+id/hint_max"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_max"
-            android:inputType="number"/>
+            <Spinner
+                android:id="@+id/spn_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing"
+                android:layout_marginBottom="@dimen/spacing"/>
+
+            <EditText
+                android:id="@+id/hint_max"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_max"
+                android:inputType="number"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

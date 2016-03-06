@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Category -->
+    <string-array name="category_array">
+        <item>Mobile game</item>
+        <item>Computer game</item>
+        <item>Console game</item>
+        <item>Handheld game</item>
+    </string-array>
+
     <!-- Recovery Rate -->
     <string-array name="recovery_rate_array">
         <item>1 minute</item>

@@ -16,8 +16,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView mGameTitle;
-        private final TextView mRateTitle;
-        private final TextView mStaminaTitle;
+        private final TextView mGameCategory;
 
         public ViewHolder(View v) {
             super(v);
@@ -31,8 +30,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             });
 
             mGameTitle = (TextView) v.findViewById(R.id.game_title);
-            mRateTitle = (TextView) v.findViewById(R.id.game_rate);
-            mStaminaTitle = (TextView) v.findViewById(R.id.game_max);
+            mGameCategory = (TextView) v.findViewById(R.id.game_category);
         }
     }
 
@@ -40,7 +38,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         this.games = games;
     }
 
-    // Create new views (invoked by the layout manager)
+    // Create new views (invoked by LayoutManager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
@@ -50,24 +48,23 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return new ViewHolder(v);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    // Replace the contents of a view (invoked by LayoutManager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         Log.d(TAG, "Element " + position + " set.");
         Game game = games.get(position);
 
         viewHolder.mGameTitle.setText(game.getTitle());
-        viewHolder.mRateTitle.setText(getRateString(game.getUnit(), game.getRecoveryRate()));
-        viewHolder.mStaminaTitle.setText(getMaxString(game.getMaxStamina()));
+        viewHolder.mGameCategory.setText(game.getCategory());
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    // Return the size of the data set (invoked by LayoutManager)
     @Override
     public int getItemCount() {
         return games.size();
     }
 
-    public String getRateString(String unit, int rate) {
+/*    public String getRateString(String unit, int rate) {
         String result, timeUnit, rateValueString;
         int rateValue;
 
@@ -99,5 +96,5 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     public String getMaxString(int max) {
         return "Maximum stamina value: " + max;
-    }
+    }*/
 }
