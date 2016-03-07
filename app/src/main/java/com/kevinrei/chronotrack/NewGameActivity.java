@@ -1,13 +1,17 @@
 package com.kevinrei.chronotrack;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +33,7 @@ import java.io.File;
 public class NewGameActivity extends AppCompatActivity {
 
     /** Action code */
+    private static final int REQUEST_EXTERNAL_READ_PERMISSION = 0;
     private static final int SELECT_PICTURE = 1;
 
     /** Database and data values*/
@@ -133,6 +138,22 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_READ_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    startImageSelectionIntent();
+                } else {
+                    // permission denied, boo!
+                    Picasso.with(getApplicationContext()).load(R.mipmap.ic_launcher).into(mImage);
+                }
+            }
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
@@ -175,6 +196,7 @@ public class NewGameActivity extends AppCompatActivity {
         gameTitle = mTitle.getText().toString();
 
         // Image
+        gameImage = imgContent;
 
         // Category
         gameCategory = mCategory.getSelectedItem().toString();
@@ -225,6 +247,34 @@ public class NewGameActivity extends AppCompatActivity {
         return mRateValueArray[rate.getSelectedItemPosition()];
     }
 
+    private void checkExternalPermissionThenStart() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_EXTERNAL_READ_PERMISSION);
+            }
+        } else {
+            startImageSelectionIntent();
+        }
+    }
+
+    private void startImageSelectionIntent() {
+        Intent i = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, SELECT_PICTURE);
+    }
+
     /** Listeners */
 
     // Create an AlertDialog when the image is clicked
@@ -249,9 +299,7 @@ public class NewGameActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
                         Log.d("Image", "Select image from external storage");
-                        Intent i = new Intent(Intent.ACTION_PICK,
-                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(i, SELECT_PICTURE);
+                        checkExternalPermissionThenStart();
                     }
 
                     else {
