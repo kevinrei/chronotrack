@@ -1,7 +1,11 @@
 package com.kevinrei.chronotrack;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -18,13 +22,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+
 public class NewGameActivity extends AppCompatActivity {
 
+    /** Action code */
+    private static final int SELECT_PICTURE = 1;
+
+    /** Database and data values*/
     private MySQLiteHelper db;
 
-    /** Data Values */
     String gameTitle;
-    // String gameImage;
+    String gameImage;
     String gameCategory;
     String staminaUnit;
     int recoveryRate;
@@ -39,6 +50,9 @@ public class NewGameActivity extends AppCompatActivity {
     EditText mUnit;
     Spinner mRecovery;
     EditText mStamina;
+
+    /** Image */
+    private String imgContent = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +80,8 @@ public class NewGameActivity extends AppCompatActivity {
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategory.setAdapter(categoryAdapter);
 
+        // Do not show Snackbar when activity is created
+        mCategory.setSelection(0, false);
         mCategory.setOnItemSelectedListener(mMobileListener);
 
         ArrayAdapter<CharSequence> rateAdapter = ArrayAdapter.createFromResource(
@@ -116,6 +132,41 @@ public class NewGameActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri selectedImageUri = data.getData();
+                imgContent = selectedImageUri.toString();
+                Picasso.with(getApplicationContext()).load(selectedImageUri).into(mImage);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString("mTitle", mTitle.getText().toString());
+        savedInstanceState.putString("mImage", imgContent);
+        savedInstanceState.putInt("mCategory", mCategory.getSelectedItemPosition());
+        savedInstanceState.putString("mUnit", mUnit.getText().toString());
+        savedInstanceState.putInt("mRecovery", mRecovery.getSelectedItemPosition());
+        savedInstanceState.putString("mStamina", mStamina.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mTitle.setText(savedInstanceState.getString("mTitle"));
+        imgContent = savedInstanceState.getString("mImage");
+        mImage.setImageURI(Uri.parse(imgContent));
+        mCategory.setSelection(savedInstanceState.getInt("mCategory"), false);
+        mUnit.setText(savedInstanceState.getString("mUnit"));
+        mRecovery.setSelection(savedInstanceState.getInt("mRecovery"));
+        mStamina.setText(savedInstanceState.getString("mStamina"));
+    }
+
+
     /** Custom methods */
 
     // Update the database with the new game
@@ -157,11 +208,6 @@ public class NewGameActivity extends AppCompatActivity {
         db.addGame(game);
     }
 
-    // Check if the new game is a Mobile game
-    private boolean isMobileGame(Spinner spinner) {
-        return (spinner.getSelectedItemPosition() == 0);
-    }
-
     // Check if the EditText field is empty
     private boolean isEmpty(EditText editText) {
         return editText.getText().toString().trim().length() == 0;
@@ -178,6 +224,8 @@ public class NewGameActivity extends AppCompatActivity {
         int[] mRateValueArray = getResources().getIntArray(R.array.recovery_rate_value_array);
         return mRateValueArray[rate.getSelectedItemPosition()];
     }
+
+    /** Listeners */
 
     // Create an AlertDialog when the image is clicked
     private View.OnClickListener mImageClickListener = new View.OnClickListener() {
@@ -201,7 +249,12 @@ public class NewGameActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
                         Log.d("Image", "Select image from external storage");
-                    } else {
+                        Intent i = new Intent(Intent.ACTION_PICK,
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(i, SELECT_PICTURE);
+                    }
+
+                    else {
                         Log.d("Image", "Retrieve image from URL");
                     }
                 }
@@ -222,6 +275,9 @@ public class NewGameActivity extends AppCompatActivity {
             else {
                 mMobileLayout.setVisibility(View.GONE);
             }
+
+            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected",
+                    Snackbar.LENGTH_SHORT).show();
         }
 
         @Override
