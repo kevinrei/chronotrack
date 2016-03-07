@@ -1,6 +1,12 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
@@ -18,15 +24,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
+    /** Action code */
+    private static final int SELECT_INSTALLED_APP = 0;
+
     /** ViewPager */
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private View parent;
+
+    /** App info */
+    String selectedTitle;
+    String selectedIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
 
                 if (id == R.id.action_add_installed) {
-                    Snackbar.make(parent, getString(R.string.action_add_installed), Snackbar.LENGTH_SHORT).show();
+                    Intent selectInstalledIntent = new Intent(MainActivity.this, InstalledAppActivity.class);
+                    startActivityForResult(selectInstalledIntent, SELECT_INSTALLED_APP);
                     return true;
                 }
 
@@ -114,6 +131,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_INSTALLED_APP) {
+                selectedTitle = data.getStringExtra("app_title");
+                selectedIcon = data.getStringExtra("app_icon");
+                Intent addGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
+                addGameIntent.putExtra("app_title", selectedTitle);
+                addGameIntent.putExtra("app_icon", selectedIcon);
+                startActivity(addGameIntent);
+            }
+        }
     }
 
     @Override

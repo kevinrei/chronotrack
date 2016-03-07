@@ -3,6 +3,7 @@
     <!-- App Labels -->
     <string name="app_name">ChronoTrack</string>
     <string name="new_game_activity">Add New Game</string>
+    <string name="installed_app">Select Installed Application</string>
 
     <!-- Menu -->
     <string name="action_about">About</string>

@@ -1,6 +1,8 @@
 package com.kevinrei.chronotrack;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -76,6 +78,8 @@ public class NewGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_game);
         mView = findViewById(R.id.main_content);
 
+        Intent i = getIntent();
+
         db = new MySQLiteHelper(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,6 +92,18 @@ public class NewGameActivity extends AppCompatActivity {
         mUnit = (EditText) findViewById(R.id.hint_unit);
         mRecovery = (Spinner) findViewById(R.id.spn_rate);
         mStamina = (EditText) findViewById(R.id.hint_max);
+
+        // If i is not null, then an installed app was selected
+        if (i != null) {
+            mTitle.setText(i.getStringExtra("app_title"));
+
+            byte[] decode = Base64.decode(i.getStringExtra("app_icon"), 0);
+            Bitmap bm = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+            imgContent = bitmapToString(getContentResolver(), bm);
+            Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
+
+            mCategory.setEnabled(false);
+        }
 
         mImage.setOnClickListener(mImageClickListener);
 
@@ -331,11 +347,8 @@ public class NewGameActivity extends AppCompatActivity {
             }
 
             // Convert to a string
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             if (bitmap != null) {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                filePath = MediaStore.Images.Media.insertImage(getContentResolver(),
-                        bitmap, "Title", null);
+                filePath = bitmapToString(getContentResolver(), bitmap);
             }
         }
 
@@ -353,6 +366,12 @@ public class NewGameActivity extends AppCompatActivity {
         }
 
         return filePath;
+    }
+
+    public String bitmapToString(ContentResolver cr, Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        return MediaStore.Images.Media.insertImage(cr, bitmap, "Title", null);
     }
 
     /** Listeners */
