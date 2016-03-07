@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -19,6 +18,7 @@ import android.widget.ListView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InstalledAppActivity extends AppCompatActivity {
@@ -79,6 +79,7 @@ public class InstalledAppActivity extends AppCompatActivity {
             }
         }
 
+        Collections.sort(installedList, new ApplicationInfo.DisplayNameComparator(pm));
         return installedList;
     }
 

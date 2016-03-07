@@ -94,10 +94,13 @@ public class NewGameActivity extends AppCompatActivity {
         mStamina = (EditText) findViewById(R.id.hint_max);
 
         // If i is not null, then an installed app was selected
-        if (i != null) {
-            mTitle.setText(i.getStringExtra("app_title"));
+        String appTitle = i.getStringExtra("app_title");
+        String appIcon = i.getStringExtra("app_icon");
 
-            byte[] decode = Base64.decode(i.getStringExtra("app_icon"), 0);
+        if (appTitle != null && appIcon != null) {
+            mTitle.setText(appTitle);
+
+            byte[] decode = Base64.decode(appIcon, 0);
             Bitmap bm = BitmapFactory.decodeByteArray(decode, 0, decode.length);
             imgContent = bitmapToString(getContentResolver(), bm);
             Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
