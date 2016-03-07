@@ -1,12 +1,15 @@
 package com.kevinrei.chronotrack;
 
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -17,6 +20,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private List<Game> games;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView mGameImage;
         private final TextView mGameTitle;
         private final TextView mGameCategory;
 
@@ -31,6 +35,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 }
             });
 
+            mGameImage = (ImageView) v.findViewById(R.id.game_img);
             mGameTitle = (TextView) v.findViewById(R.id.game_title);
             mGameCategory = (TextView) v.findViewById(R.id.game_category);
         }
@@ -56,6 +61,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         Log.d(TAG, "Element " + position + " set.");
         Game game = games.get(position);
 
+        Log.d("Bitmap", "Image string: " + game.getImage());
+        // viewHolder.mGameImage.setImageBitmap(convertToBitmap(game.getImage()));
+        viewHolder.mGameImage.setImageURI(Uri.parse(game.getImage()));
         viewHolder.mGameTitle.setText(game.getTitle());
         viewHolder.mGameCategory.setText(game.getCategory());
     }
@@ -66,9 +74,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return games.size();
     }
 
-    public static void createDeleteDialog(int position) {
-
-    }
+/*    public Bitmap convertToBitmap(String encoded) {
+        try {
+            byte[] encodeByte = Base64.decode(encoded, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+        } catch(Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }*/
 
 /*    public String getRateString(String unit, int rate) {
         String result, timeUnit, rateValueString;

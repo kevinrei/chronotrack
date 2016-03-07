@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,12 +31,19 @@ import android.widget.Spinner;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NewGameActivity extends AppCompatActivity {
 
     /** Action code */
-    private static final int REQUEST_EXTERNAL_READ_PERMISSION = 0;
+    private static final int REQUEST_EXTERNAL_STORAGE_PERMISSIONS = 0;
     private static final int SELECT_PICTURE = 1;
 
     /** Database and data values*/
@@ -57,6 +67,7 @@ public class NewGameActivity extends AppCompatActivity {
     EditText mStamina;
 
     /** Image */
+    private String imgPreview = "";
     private String imgContent = "";
 
     @Override
@@ -138,17 +149,33 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_EXTERNAL_READ_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay!
-                    startImageSelectionIntent();
-                } else {
-                    // permission denied, boo!
-                    Picasso.with(getApplicationContext()).load(R.mipmap.ic_launcher).into(mImage);
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == REQUEST_EXTERNAL_STORAGE_PERMISSIONS) {
+            // Permissions
+            Map<String, Integer> hashPermissions = new HashMap<>();
+
+            // Initialize the hashmap with both permissions granted
+            hashPermissions.put(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    PackageManager.PERMISSION_GRANTED);
+            hashPermissions.put(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    PackageManager.PERMISSION_GRANTED);
+
+            // Fill in with actual user results
+            if (grantResults.length > 0) {
+                for (int i = 0; i < permissions.length; i++) {
+                    hashPermissions.put(permissions[i], grantResults[i]);
                 }
+
+                // Check for both permissions
+                if (hashPermissions.get(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED &&
+                        hashPermissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    startImageSelectionIntent();
+                }
+            } else {
+                // permission denied, boo!
+                Picasso.with(getApplicationContext()).load(R.mipmap.ic_launcher).into(mImage);
             }
         }
     }
@@ -158,7 +185,8 @@ public class NewGameActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
                 Uri selectedImageUri = data.getData();
-                imgContent = selectedImageUri.toString();
+                imgPreview = selectedImageUri.toString();
+                imgContent = getFilePath(selectedImageUri);
                 Picasso.with(getApplicationContext()).load(selectedImageUri).into(mImage);
             }
         }
@@ -168,6 +196,7 @@ public class NewGameActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putString("mTitle", mTitle.getText().toString());
+        savedInstanceState.putString("preview", imgPreview);
         savedInstanceState.putString("mImage", imgContent);
         savedInstanceState.putInt("mCategory", mCategory.getSelectedItemPosition());
         savedInstanceState.putString("mUnit", mUnit.getText().toString());
@@ -179,8 +208,9 @@ public class NewGameActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mTitle.setText(savedInstanceState.getString("mTitle"));
+        imgPreview = savedInstanceState.getString("preview");
+        mImage.setImageURI(Uri.parse(imgPreview));
         imgContent = savedInstanceState.getString("mImage");
-        mImage.setImageURI(Uri.parse(imgContent));
         mCategory.setSelection(savedInstanceState.getInt("mCategory"), false);
         mUnit.setText(savedInstanceState.getString("mUnit"));
         mRecovery.setSelection(savedInstanceState.getInt("mRecovery"));
@@ -196,7 +226,11 @@ public class NewGameActivity extends AppCompatActivity {
         gameTitle = mTitle.getText().toString();
 
         // Image
-        gameImage = imgContent;
+        if (imgContent == null) {
+            gameImage = "";
+        } else {
+            gameImage = imgContent;
+        }
 
         // Category
         gameCategory = mCategory.getSelectedItem().toString();
@@ -221,7 +255,7 @@ public class NewGameActivity extends AppCompatActivity {
         Game game = new Game();
 
         game.setTitle(gameTitle);
-        // game.setImage(gameImage);
+        game.setImage(gameImage);
         game.setCategory(gameCategory);
         game.setUnit(staminaUnit);
         game.setRecoveryRate(recoveryRate);
@@ -247,24 +281,29 @@ public class NewGameActivity extends AppCompatActivity {
         return mRateValueArray[rate.getSelectedItemPosition()];
     }
 
-    private void checkExternalPermissionThenStart() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+    private void checkExternalStoragePermissionsThenStart() {
+        int readPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        int writePermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+        List<String> permissionsRequired = new ArrayList<>();
 
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_EXTERNAL_READ_PERMISSION);
-            }
-        } else {
+        if (readPermission != PackageManager.PERMISSION_GRANTED) {
+            permissionsRequired.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+
+        if (writePermission != PackageManager.PERMISSION_GRANTED) {
+            permissionsRequired.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (!permissionsRequired.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    permissionsRequired.toArray(new String[permissionsRequired.size()]),
+                    REQUEST_EXTERNAL_STORAGE_PERMISSIONS);
+        }
+
+        else {
             startImageSelectionIntent();
         }
     }
@@ -273,6 +312,47 @@ public class NewGameActivity extends AppCompatActivity {
         Intent i = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, SELECT_PICTURE);
+    }
+
+    private String getFilePath(Uri uri) {
+        String filePath = "";
+
+        // Handle Google photos
+        Bitmap bitmap = null;
+        InputStream inputStream;
+        if (uri != null &&
+                uri.toString().startsWith("content://com.google.android.apps.photos.content")) {
+            // Convert to bitmap
+            try {
+                inputStream = getContentResolver().openInputStream(Uri.parse(uri.toString()));
+                bitmap = BitmapFactory.decodeStream(inputStream);
+            } catch(FileNotFoundException e) {
+                e.getMessage();
+            }
+
+            // Convert to a string
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                filePath = MediaStore.Images.Media.insertImage(getContentResolver(),
+                        bitmap, "Title", null);
+            }
+        }
+
+        else if (uri != null && "content".equals(uri.getScheme())) {
+            Cursor cursor = this.getContentResolver().query(uri,
+                    new String[] { android.provider.MediaStore.Images.ImageColumns.DATA },
+                    null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                filePath = cursor.getString(0);
+                cursor.close();
+            }
+        } else {
+            filePath = uri.getPath();
+        }
+
+        return filePath;
     }
 
     /** Listeners */
@@ -299,7 +379,7 @@ public class NewGameActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
                         Log.d("Image", "Select image from external storage");
-                        checkExternalPermissionThenStart();
+                        checkExternalStoragePermissionsThenStart();
                     }
 
                     else {
