@@ -1,25 +1,17 @@
 package com.kevinrei.chronotrack;
 
 import android.Manifest;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,23 +22,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.soundcloud.android.crop.Crop;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 public class NewGameActivity extends AppCompatActivity {
 
     /** Action code */
-    private static final int REQUEST_EXTERNAL_STORAGE_PERMISSIONS = 0;
-    private static final int SELECT_PICTURE = 1;
+    private static final int REQUEST_EXTERNAL_READ_PERMISSION = 0;
 
     /** Database and data values*/
     private MySQLiteHelper db;
@@ -69,7 +56,6 @@ public class NewGameActivity extends AppCompatActivity {
     EditText mStamina;
 
     /** Image */
-    private String imgPreview = "";
     private String imgContent = "";
 
     @Override
@@ -100,9 +86,7 @@ public class NewGameActivity extends AppCompatActivity {
         if (appTitle != null && appIcon != null) {
             mTitle.setText(appTitle);
 
-            byte[] decode = Base64.decode(appIcon, 0);
-            Bitmap bm = BitmapFactory.decodeByteArray(decode, 0, decode.length);
-            imgContent = bitmapToString(getContentResolver(), bm);
+            imgContent = appIcon;
             Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
 
             mCategory.setEnabled(false);
@@ -123,6 +107,29 @@ public class NewGameActivity extends AppCompatActivity {
                 this, R.array.recovery_rate_array, android.R.layout.simple_spinner_item);
         rateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mRecovery.setAdapter(rateAdapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString("mTitle", mTitle.getText().toString());
+        savedInstanceState.putString("mImage", imgContent);
+        savedInstanceState.putInt("mCategory", mCategory.getSelectedItemPosition());
+        savedInstanceState.putString("mUnit", mUnit.getText().toString());
+        savedInstanceState.putInt("mRecovery", mRecovery.getSelectedItemPosition());
+        savedInstanceState.putString("mStamina", mStamina.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mTitle.setText(savedInstanceState.getString("mTitle"));
+        imgContent = savedInstanceState.getString("mImage");
+        Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
+        mCategory.setSelection(savedInstanceState.getInt("mCategory"), false);
+        mUnit.setText(savedInstanceState.getString("mUnit"));
+        mRecovery.setSelection(savedInstanceState.getInt("mRecovery"));
+        mStamina.setText(savedInstanceState.getString("mStamina"));
     }
 
     @Override
@@ -169,72 +176,88 @@ public class NewGameActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == REQUEST_EXTERNAL_STORAGE_PERMISSIONS) {
-            // Permissions
-            Map<String, Integer> hashPermissions = new HashMap<>();
-
-            // Initialize the hashmap with both permissions granted
-            hashPermissions.put(Manifest.permission.READ_EXTERNAL_STORAGE,
-                    PackageManager.PERMISSION_GRANTED);
-            hashPermissions.put(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    PackageManager.PERMISSION_GRANTED);
-
-            // Fill in with actual user results
-            if (grantResults.length > 0) {
-                for (int i = 0; i < permissions.length; i++) {
-                    hashPermissions.put(permissions[i], grantResults[i]);
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_READ_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    Crop.pickImage(this);
+                } else {
+                    // permission denied, boo!
+                    Picasso.with(getApplicationContext()).load(R.mipmap.ic_launcher).into(mImage);
                 }
-
-                // Check for both permissions
-                if (hashPermissions.get(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED &&
-                        hashPermissions.get(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    startImageSelectionIntent();
-                }
-            } else {
-                // permission denied, boo!
-                Picasso.with(getApplicationContext()).load(R.mipmap.ic_launcher).into(mImage);
             }
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == SELECT_PICTURE) {
-                Uri selectedImageUri = data.getData();
-                imgPreview = selectedImageUri.toString();
-                imgContent = getFilePath(selectedImageUri);
-                Picasso.with(getApplicationContext()).load(selectedImageUri).into(mImage);
-            }
+        if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
+            beginCrop(data.getData());
+        } else if (requestCode == Crop.REQUEST_CROP) {
+            handleCrop(resultCode, data);
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("mTitle", mTitle.getText().toString());
-        savedInstanceState.putString("preview", imgPreview);
-        savedInstanceState.putString("mImage", imgContent);
-        savedInstanceState.putInt("mCategory", mCategory.getSelectedItemPosition());
-        savedInstanceState.putString("mUnit", mUnit.getText().toString());
-        savedInstanceState.putInt("mRecovery", mRecovery.getSelectedItemPosition());
-        savedInstanceState.putString("mStamina", mStamina.getText().toString());
-    }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mTitle.setText(savedInstanceState.getString("mTitle"));
-        imgPreview = savedInstanceState.getString("preview");
-        mImage.setImageURI(Uri.parse(imgPreview));
-        imgContent = savedInstanceState.getString("mImage");
-        mCategory.setSelection(savedInstanceState.getInt("mCategory"), false);
-        mUnit.setText(savedInstanceState.getString("mUnit"));
-        mRecovery.setSelection(savedInstanceState.getInt("mRecovery"));
-        mStamina.setText(savedInstanceState.getString("mStamina"));
-    }
+    /** Listeners */
+
+    // Create an AlertDialog when the image is clicked
+    private View.OnClickListener mImageClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            CharSequence[] options = new CharSequence[] {
+                    "Select image from external storage",
+                    "Retrieve image from URL"
+            };
+
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
+            mBuilder.setTitle("Icon options");
+            mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        Log.d("Image", "Select image from external storage");
+                        checkExternalPermissionThenStart();
+                    }
+
+                    else {
+                        Log.d("Image", "Retrieve image from URL");
+                    }
+                }
+            });
+            mBuilder.show();
+        }
+    };
+
+    private AdapterView.OnItemSelectedListener mMobileListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            // It is a mobile game
+            if (position == 0) {
+                mMobileLayout.setVisibility(View.VISIBLE);
+            }
+
+            // Not a mobile game
+            else {
+                mMobileLayout.setVisibility(View.GONE);
+            }
+
+            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected",
+                    Snackbar.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
 
 
     /** Custom methods */
@@ -300,139 +323,44 @@ public class NewGameActivity extends AppCompatActivity {
         return mRateValueArray[rate.getSelectedItemPosition()];
     }
 
-    private void checkExternalStoragePermissionsThenStart() {
-        int readPermission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE);
-        int writePermission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    private void checkExternalPermissionThenStart() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        List<String> permissionsRequired = new ArrayList<>();
-
-        if (readPermission != PackageManager.PERMISSION_GRANTED) {
-            permissionsRequired.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-
-        if (writePermission != PackageManager.PERMISSION_GRANTED) {
-            permissionsRequired.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-
-        if (!permissionsRequired.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                    permissionsRequired.toArray(new String[permissionsRequired.size()]),
-                    REQUEST_EXTERNAL_STORAGE_PERMISSIONS);
-        }
-
-        else {
-            startImageSelectionIntent();
-        }
-    }
-
-    private void startImageSelectionIntent() {
-        Intent i = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(i, SELECT_PICTURE);
-    }
-
-    private String getFilePath(Uri uri) {
-        String filePath = "";
-
-        // Handle Google photos
-        Bitmap bitmap = null;
-        InputStream inputStream;
-        if (uri != null &&
-                uri.toString().startsWith("content://com.google.android.apps.photos.content")) {
-            // Convert to bitmap
-            try {
-                inputStream = getContentResolver().openInputStream(Uri.parse(uri.toString()));
-                bitmap = BitmapFactory.decodeStream(inputStream);
-            } catch(FileNotFoundException e) {
-                e.getMessage();
-            }
-
-            // Convert to a string
-            if (bitmap != null) {
-                filePath = bitmapToString(getContentResolver(), bitmap);
-            }
-        }
-
-        else if (uri != null && "content".equals(uri.getScheme())) {
-            Cursor cursor = this.getContentResolver().query(uri,
-                    new String[] { android.provider.MediaStore.Images.ImageColumns.DATA },
-                    null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                filePath = cursor.getString(0);
-                cursor.close();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_EXTERNAL_READ_PERMISSION);
             }
         } else {
-            filePath = uri.getPath();
+            Crop.pickImage(this);
         }
-
-        return filePath;
     }
 
-    public String bitmapToString(ContentResolver cr, Bitmap bitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        return MediaStore.Images.Media.insertImage(cr, bitmap, "Title", null);
+    /** android-crop */
+
+    private void beginCrop(Uri source) {
+        // Unique identifier for each cached uri
+        String cacheID = UUID.randomUUID().toString().replaceAll("-", "");
+        Uri destination = Uri.fromFile(new File(getCacheDir(), cacheID));
+        Crop.of(source, destination).asSquare().start(this);
     }
 
-    /** Listeners */
-
-    // Create an AlertDialog when the image is clicked
-    private View.OnClickListener mImageClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            CharSequence[] options = new CharSequence[] {
-                    "Select image from external storage",
-                    "Retrieve image from URL"
-            };
-
-            AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
-            mBuilder.setTitle("Icon options");
-            mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            mBuilder.setItems(options, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        Log.d("Image", "Select image from external storage");
-                        checkExternalStoragePermissionsThenStart();
-                    }
-
-                    else {
-                        Log.d("Image", "Retrieve image from URL");
-                    }
-                }
-            });
-            mBuilder.show();
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            Uri output = Crop.getOutput(result);
+            Log.d("icon", output.toString());
+            Picasso.with(getApplicationContext()).load(output).into(mImage);
+            imgContent = output.toString();
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            Snackbar.make(mView, Crop.getError(result).getMessage(), Snackbar.LENGTH_SHORT).show();
         }
-    };
-
-    private AdapterView.OnItemSelectedListener mMobileListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            // It is a mobile game
-            if (position == 0) {
-                mMobileLayout.setVisibility(View.VISIBLE);
-            }
-
-            // Not a mobile game
-            else {
-                mMobileLayout.setVisibility(View.GONE);
-            }
-
-            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected",
-                    Snackbar.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    };
+    }
 }

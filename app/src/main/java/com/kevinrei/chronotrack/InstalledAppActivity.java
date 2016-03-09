@@ -47,17 +47,11 @@ public class InstalledAppActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ApplicationInfo app = installedApps.get(position);
                 Intent i = new Intent();
-                Log.d("Title", app.loadLabel(pm).toString());
+
                 i.putExtra("app_title", app.loadLabel(pm).toString());
 
-                Bitmap bitmap = ((BitmapDrawable) app.loadIcon(pm)).getBitmap();
-                // Convert to a string
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                byte[] b = bytes.toByteArray();
-                String bStr = Base64.encodeToString(b, 0);
-
-                i.putExtra("app_icon", bStr);
+                String icon = "android.resource://" + app.packageName + "/" + app.icon;
+                i.putExtra("app_icon", icon);
 
                 setResult(RESULT_OK, i);
                 finish();

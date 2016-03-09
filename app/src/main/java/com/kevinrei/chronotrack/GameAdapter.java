@@ -1,5 +1,6 @@
 package com.kevinrei.chronotrack;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,11 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     private static final String TAG = "GameAdapter";
+    private static final int IMG_DIMEN = 48;
     private List<Game> games;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -58,9 +62,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         Log.d(TAG, "Element " + position + " set.");
         Game game = games.get(position);
 
-        Log.d("Bitmap", "Image string: " + game.getImage());
-        // viewHolder.mGameImage.setImageBitmap(convertToBitmap(game.getImage()));
-        viewHolder.mGameImage.setImageURI(Uri.parse(game.getImage()));
+        Picasso.with(viewHolder.mGameImage.getContext())
+                .load(Uri.parse(game.getImage()))
+                .into(viewHolder.mGameImage);
         viewHolder.mGameTitle.setText(game.getTitle());
         viewHolder.mGameCategory.setText(game.getCategory());
     }
@@ -71,15 +75,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return games.size();
     }
 
-/*    public Bitmap convertToBitmap(String encoded) {
-        try {
-            byte[] encodeByte = Base64.decode(encoded, Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-        } catch(Exception e) {
-            e.getMessage();
-            return null;
-        }
-    }*/
 
 /*    public String getRateString(String unit, int rate) {
         String result, timeUnit, rateValueString;
