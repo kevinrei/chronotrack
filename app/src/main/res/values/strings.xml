@@ -23,8 +23,9 @@
     <string name="hint_max">Maximum Stamina Value</string>
     <string name="unfilled_title">The title is missing.</string>
     <string name="invalid_max">The MAX value must be &gt;= 0 and &lt;= 999.</string>
-    <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
+    <string name="hint_url">Enter URL</string>
+    <string name="unfilled_url">The URL is missing.</string>
+    <string name="invalid_url">The URL is invalid.</string>
 
     <!-- Game List Item -->
     <string name="game_title">Title</string>

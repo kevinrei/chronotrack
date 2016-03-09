@@ -13,6 +13,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -229,6 +231,7 @@ public class NewGameActivity extends AppCompatActivity {
 
                     else {
                         Log.d("Image", "Retrieve image from URL");
+                        showImageURLDialog();
                     }
                 }
             });
@@ -261,6 +264,23 @@ public class NewGameActivity extends AppCompatActivity {
 
 
     /** Custom methods */
+
+    // Check if the EditText field is empty
+    private boolean isEmpty(EditText editText) {
+        return editText.getText().toString().trim().length() == 0;
+    }
+
+    // Check if max stamina is within range
+    private boolean isValidMax(EditText editText) {
+        int val = Integer.parseInt(editText.getText().toString());
+        return (val >= 0 && val <= 999);
+    }
+
+    // Get the recovery rate integer value (in seconds)
+    private int getRateValue(Spinner rate) {
+        int[] mRateValueArray = getResources().getIntArray(R.array.recovery_rate_value_array);
+        return mRateValueArray[rate.getSelectedItemPosition()];
+    }
 
     // Update the database with the new game
     private void updateGameLibrary() {
@@ -306,23 +326,6 @@ public class NewGameActivity extends AppCompatActivity {
         db.addGame(game);
     }
 
-    // Check if the EditText field is empty
-    private boolean isEmpty(EditText editText) {
-        return editText.getText().toString().trim().length() == 0;
-    }
-
-    // Check if max stamina is within range
-    private boolean isValidMax(EditText editText) {
-        int val = Integer.parseInt(editText.getText().toString());
-        return (val >= 0 && val <= 999);
-    }
-
-    // Get the recovery rate integer value (in seconds)
-    private int getRateValue(Spinner rate) {
-        int[] mRateValueArray = getResources().getIntArray(R.array.recovery_rate_value_array);
-        return mRateValueArray[rate.getSelectedItemPosition()];
-    }
-
     private void checkExternalPermissionThenStart() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -344,12 +347,54 @@ public class NewGameActivity extends AppCompatActivity {
         }
     }
 
+    private void showImageURLDialog() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        LayoutInflater mInflater = this.getLayoutInflater();
+        final View mDialogView = mInflater.inflate(R.layout.dialog_image_url, null);
+        mBuilder.setView(mDialogView);
+
+        final EditText editURL = (EditText) mDialogView.findViewById(R.id.img_url);
+
+        mBuilder.setTitle("Enter Image URL");
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        mBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (isEmpty(editURL)) {
+                    Toast.makeText(getApplicationContext(),
+                            getString(R.string.unfilled_url),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    String url = editURL.getText().toString();
+                    if (Patterns.WEB_URL.matcher(url).matches()) {
+                        imgContent = url;
+                        Picasso.with(getApplicationContext()).load(url).into(mImage);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.invalid_url),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        mBuilder.show();
+    }
+
+    private File createImageCacheFile() {
+        String cacheID = UUID.randomUUID().toString().replaceAll("-", "");
+        return new File(getCacheDir(), cacheID);
+    }
+
     /** android-crop */
 
     private void beginCrop(Uri source) {
         // Unique identifier for each cached uri
-        String cacheID = UUID.randomUUID().toString().replaceAll("-", "");
-        Uri destination = Uri.fromFile(new File(getCacheDir(), cacheID));
+        Uri destination = Uri.fromFile(createImageCacheFile());
         Crop.of(source, destination).asSquare().start(this);
     }
 
