@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -355,46 +356,57 @@ public class NewGameActivity extends AppCompatActivity {
 
         final EditText editURL = (EditText) mDialogView.findViewById(R.id.img_url);
 
-        mBuilder.setTitle("Enter Image URL");
-        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        mBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (isEmpty(editURL)) {
-                    Toast.makeText(getApplicationContext(),
-                            getString(R.string.unfilled_url),
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    String url = editURL.getText().toString();
-                    if (Patterns.WEB_URL.matcher(url).matches()) {
-                        imgContent = url;
-                        Picasso.with(getApplicationContext()).load(url).into(mImage);
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                getString(R.string.invalid_url),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-        mBuilder.show();
-    }
+        mBuilder.setTitle("Enter Image URL")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Save", null);
 
-    private File createImageCacheFile() {
-        String cacheID = UUID.randomUUID().toString().replaceAll("-", "");
-        return new File(getCacheDir(), cacheID);
+        final AlertDialog mDialog = mBuilder.create();
+
+        mDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button cancel = mDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDialog.cancel();
+                    }
+                });
+
+                Button save = mDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (isEmpty(editURL)) {
+                            Toast.makeText(getApplicationContext(),
+                                    getString(R.string.unfilled_url),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            String url = editURL.getText().toString();
+                            if (Patterns.WEB_URL.matcher(url).matches()) {
+                                imgContent = url;
+                                Picasso.with(getApplicationContext()).load(url).into(mImage);
+                                mDialog.dismiss();
+                            } else {
+                                Toast.makeText(getApplicationContext(),
+                                        getString(R.string.invalid_url),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        mDialog.show();
     }
 
     /** android-crop */
 
     private void beginCrop(Uri source) {
         // Unique identifier for each cached uri
-        Uri destination = Uri.fromFile(createImageCacheFile());
+        String cacheID = UUID.randomUUID().toString().replaceAll("-", "");
+        Uri destination = Uri.fromFile(new File(getCacheDir(), cacheID));
         Crop.of(source, destination).asSquare().start(this);
     }
 

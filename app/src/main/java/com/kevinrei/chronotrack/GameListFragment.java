@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+/**
+ * GameListFragment is the ViewPager for the list of games entered by the user.
+ */
 public class GameListFragment extends Fragment {
 
     private static final String TAG = "GameListFragment";

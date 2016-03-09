@@ -36,7 +36,7 @@
 
     <string name="game_rate">Recovery rate: 1 Unit / Rate</string>
     <string name="game_max">Maximum stamina value:</string>
-    <string name="games_list">This is a list of games.</string>
     <string name="alarms_list">This is a list of alarms.</string>
+    <string name="timer_text">This is a timer.</string>
 
 </resources>

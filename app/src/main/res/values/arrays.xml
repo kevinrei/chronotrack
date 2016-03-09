@@ -7,6 +7,7 @@
         <item>Computer game</item>
         <item>Console game</item>
         <item>Handheld game</item>
+        <item>Tabletop game</item>
     </string-array>
 
     <!-- Recovery Rate -->

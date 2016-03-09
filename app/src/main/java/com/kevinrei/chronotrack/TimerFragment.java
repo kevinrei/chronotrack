@@ -8,15 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * AlarmListFragment is the ViewPager for the list of alarms set by the user.
+ * TimerFragment is the ViewPager for the countdown timer.
  */
-public class AlarmListFragment extends Fragment {
+public class TimerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_alarms_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_timer, container, false);
         TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        textView.setText(getString(R.string.alarms_list));
+        textView.setText(getString(R.string.timer_text));
         return rootView;
     }
 }

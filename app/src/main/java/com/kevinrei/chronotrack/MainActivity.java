@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     /** ViewPager */
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private View parent;
 
     /** App info */
     String selectedTitle;
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        parent = findViewById(R.id.main_content);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -88,9 +86,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set up the TabLayout.  Only show the FAB on Games tab.
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.setOnTabSelectedListener(
+        TabLayout mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+
+        mTabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
@@ -173,8 +172,12 @@ public class MainActivity extends AppCompatActivity {
                 return new GameListFragment();
             }
 
-            else {
+            else if (position == 1) {
                 return new AlarmListFragment();
+            }
+
+            else {
+                return new TimerFragment();
             }
         }
 
@@ -191,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
                     return "Games";
                 case 1:
                     // Countdown: remind me in x time
-                    return "Countdown";
+                    return "Alarms";
                 case 2:
                     // Condition: remind me when x time reached
-                    return "Condition";
+                    return "Timer";
             }
             return null;
         }
