@@ -162,7 +162,9 @@ public class NewGameActivity extends AppCompatActivity {
 
             else {
                 updateGameLibrary();
-                setResult(RESULT_OK);
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("game_title", gameTitle);
+                setResult(RESULT_OK, resultIntent);
                 finish();
             }
 
@@ -253,7 +255,7 @@ public class NewGameActivity extends AppCompatActivity {
                 mMobileLayout.setVisibility(View.GONE);
             }
 
-            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected",
+            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected.",
                     Snackbar.LENGTH_SHORT).show();
         }
 

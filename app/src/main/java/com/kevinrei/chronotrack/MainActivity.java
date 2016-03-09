@@ -1,18 +1,10 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.support.design.internal.NavigationMenu;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -24,9 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
@@ -34,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
 
     /** Action code */
     private static final int SELECT_INSTALLED_APP = 0;
+    private static final int ADD_NEW_GAME = 1;
 
     /** ViewPager */
+    private View view;
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -47,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        view = findViewById(R.id.main_content);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
                 else if (id == R.id.action_add_uninstalled) {
                     Intent newGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
-                    startActivity(newGameIntent);
+                    startActivityForResult(newGameIntent, ADD_NEW_GAME);
                     return true;
                 }
 
@@ -141,7 +133,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent addGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
                 addGameIntent.putExtra("app_title", selectedTitle);
                 addGameIntent.putExtra("app_icon", selectedIcon);
-                startActivity(addGameIntent);
+                startActivityForResult(addGameIntent, ADD_NEW_GAME);
+            }
+
+            else if (requestCode == ADD_NEW_GAME) {
+                String confirmAdd = "Successfully added " + data.getStringExtra("game_title") + ".";
+                Snackbar.make(view, confirmAdd, Snackbar.LENGTH_LONG).show();
             }
         }
     }
