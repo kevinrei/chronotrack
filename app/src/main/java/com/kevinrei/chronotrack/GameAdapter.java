@@ -1,6 +1,7 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,7 +18,6 @@ import java.util.List;
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     private static final String TAG = "GameAdapter";
-    private static final int IMG_DIMEN = 48;
     private List<Game> games;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -27,14 +27,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         public ViewHolder(View v) {
             super(v);
-
-            // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getPosition() + " clicked.");
-                }
-            });
 
             mGameImage = (ImageView) v.findViewById(R.id.game_img);
             mGameTitle = (TextView) v.findViewById(R.id.game_title);
@@ -59,14 +51,23 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     // Replace the contents of a view (invoked by LayoutManager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Log.d(TAG, "Element " + position + " set.");
-        Game game = games.get(position);
+        final Game game = games.get(position);
 
         Picasso.with(viewHolder.mGameImage.getContext())
                 .load(Uri.parse(game.getImage()))
                 .into(viewHolder.mGameImage);
         viewHolder.mGameTitle.setText(game.getTitle());
         viewHolder.mGameCategory.setText(game.getCategory());
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Intent i = new Intent(context, GameDetailActivity.class);
+                i.putExtra("game_id", game.getId());
+                context.startActivity(i);
+            }
+        });
     }
 
     // Return the size of the data set (invoked by LayoutManager)
@@ -74,7 +75,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     public int getItemCount() {
         return games.size();
     }
-
 
 /*    public String getRateString(String unit, int rate) {
         String result, timeUnit, rateValueString;

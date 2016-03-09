@@ -32,6 +32,11 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
+        <activity android:name=".GameDetailActivity"
+            android:label="@string/hint_title"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
     </application>

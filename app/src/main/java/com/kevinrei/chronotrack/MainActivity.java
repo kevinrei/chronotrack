@@ -176,9 +176,11 @@ public class MainActivity extends AppCompatActivity {
                 return new AlarmListFragment();
             }
 
-            else {
+            else if (position == 2) {
                 return new TimerFragment();
             }
+
+            return null;
         }
 
         @Override
