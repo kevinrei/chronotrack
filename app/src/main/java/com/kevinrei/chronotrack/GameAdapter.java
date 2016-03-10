@@ -1,13 +1,13 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,16 +15,24 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.Collections;
 import java.util.List;
 
-public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
+public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
+        implements ItemTouchHelperAdapter {
+
+    public interface OnStartDragListener {
+        void onStartDrag(RecyclerView.ViewHolder viewHolder);
+    }
 
     private List<Game> games;
+    private OnStartDragListener mStartDragListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView mGameImage;
         private final TextView mGameTitle;
         private final TextView mGameCategory;
+        private final ImageView mReorderHandle;
 
         public ViewHolder(View v) {
             super(v);
@@ -32,11 +40,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             mGameImage = (ImageView) v.findViewById(R.id.game_img);
             mGameTitle = (TextView) v.findViewById(R.id.game_title);
             mGameCategory = (TextView) v.findViewById(R.id.game_category);
+            mReorderHandle = (ImageView) v.findViewById(R.id.reorder_handle);
         }
     }
 
-    public GameAdapter(List<Game> games) {
+    public GameAdapter(List<Game> games, OnStartDragListener mStartDragListener) {
         this.games = games;
+        this.mStartDragListener = mStartDragListener;
     }
 
     // Create new views (invoked by LayoutManager)
@@ -51,7 +61,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     // Replace the contents of a view (invoked by LayoutManager)
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final Game game = games.get(position);
 
         Picasso.with(viewHolder.mGameImage.getContext())
@@ -70,7 +80,18 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             }
         });
 
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        viewHolder.mReorderHandle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    mStartDragListener.onStartDrag(viewHolder);
+                }
+
+                return false;
+            }
+        });
+
+/*        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 final View view = v;
@@ -100,13 +121,35 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
                 return false;
             }
-        });
+        });*/
     }
 
     // Return the size of the data set (invoked by LayoutManager)
     @Override
     public int getItemCount() {
         return games.size();
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        games.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, games.size());
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(games, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(games, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 
 /*    public String getRateString(String unit, int rate) {
