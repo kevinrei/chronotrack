@@ -23,6 +23,10 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:title="@string/hint_title"
+            app:contentInsetLeft="3dp"
+            app:contentInsetStart="3dp"
+            app:contentInsetRight="3dp"
+            app:contentInsetEnd="3dp"
             app:popupTheme="@style/AppTheme.PopupOverlay" >
 
         </android.support.v7.widget.Toolbar>

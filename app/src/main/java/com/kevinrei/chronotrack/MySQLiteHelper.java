@@ -7,11 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
         import android.database.Cursor;
         import android.database.sqlite.SQLiteDatabase;
         import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-        import java.util.LinkedList;
+import java.util.LinkedList;
         import java.util.List;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
+
+    private static final String TAG = "Game";
 
     private static int DATABASE_VERSION = 1;                        // Database version
     private static final String DATABASE_NAME = "ChronoTrack";      // Database name
@@ -86,6 +89,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Insert to database
         db.insert(TABLE_GAMES, null, values);
 
+        Log.d(TAG, game.toString());
+
         // Close the database
         db.close();
     }
@@ -122,6 +127,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         db.close();
 
+        Log.d(TAG, game.toString());
+
         // Return the name detail
         return game;
     }
@@ -129,8 +136,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Get the list of all games
     public List<Game> getAllGames() {
         List<Game> gameList = new LinkedList<>();
-
-        String query;
 
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
@@ -158,30 +163,31 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
 
+        Log.d(TAG, gameList.toString());
+
         // Return the list of games
         return gameList;
     }
 
     // Update the game details
-    public void updateGame(int id, String mTitle, String mImage, String mCategory,
-                           String mUnit, int mRecoveryRate, int mMaxStamina) {
+    public void updateGame(Game game) {
         // Get reference to a writable database
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, mTitle);
-        values.put(KEY_IMAGE, mImage);
-        values.put(KEY_CATEGORY, mCategory);
-        values.put(KEY_UNIT, mUnit);
-        values.put(KEY_RECOVERY_RATE, mRecoveryRate);
-        values.put(KEY_MAX_STAMINA, mMaxStamina);
+        values.put(KEY_TITLE, game.getTitle());
+        values.put(KEY_IMAGE, game.getImage());
+        values.put(KEY_CATEGORY, game.getCategory());
+        values.put(KEY_UNIT, game.getUnit());
+        values.put(KEY_RECOVERY_RATE, game.getRecoveryRate());
+        values.put(KEY_MAX_STAMINA, game.getMaxStamina());
 
         // Update the row
-        db.update(TABLE_GAMES,                      // table
-                values,                             // values
-                KEY_ID + " = ?",                    // selections
-                new String[]{String.valueOf(id)});  // selection arguments
+        db.update(TABLE_GAMES,                                  // table
+                values,                                         // values
+                KEY_ID + " = ?",                                // selections
+                new String[]{String.valueOf(game.getId())});    // selection arguments
 
         // Close the database
         db.close();
