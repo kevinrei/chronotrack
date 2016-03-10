@@ -1,11 +1,14 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
-        implements ItemTouchHelperAdapter {
+        implements SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
 
     public interface OnStartDragListener {
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
@@ -28,7 +31,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
     private List<Game> games;
     private OnStartDragListener mStartDragListener;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder
+            implements SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
+
         private final ImageView mGameImage;
         private final TextView mGameTitle;
         private final TextView mGameCategory;
@@ -41,6 +46,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             mGameTitle = (TextView) v.findViewById(R.id.game_title);
             mGameCategory = (TextView) v.findViewById(R.id.game_category);
             mReorderHandle = (ImageView) v.findViewById(R.id.reorder_handle);
+        }
+
+        @Override
+        public void onItemSelected() {
+            // itemView.setBackgroundResource(R.color.colorPrimaryDark);
+            itemView.setBackgroundColor(0);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
         }
     }
 
@@ -83,6 +99,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         viewHolder.mReorderHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                v.setSelected(false);
                 if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
                     mStartDragListener.onStartDrag(viewHolder);
                 }
@@ -91,37 +108,46 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             }
         });
 
-/*        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 final View view = v;
-                final Context context = v.getContext();
-                final MySQLiteHelper db = new MySQLiteHelper(context);
-                AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
 
-                String deleteTitle = "Deleting " + game.getTitle() + "...";
-                final String confirmDelete = "Successfully deleted " + game.getTitle() + ".";
-                mBuilder.setTitle(deleteTitle)
-                        .setMessage(R.string.delete_confirm)
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                db.deleteGame(game);
-                                Snackbar.make(view, confirmDelete, Snackbar.LENGTH_LONG).show();
-                            }
-                        })
-                        .create()
-                        .show();
+                CharSequence[] options = new CharSequence[] {
+                        "Create an alarm",
+                        "Edit entry",
+                        "Delete the game"
+                };
 
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
+                mBuilder.setTitle("Select an action");
+                mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            Log.d("Option 1", "Create an alarm");
+                        }
+
+                        else if (which == 1) {
+                            Log.d("Option 2", "Edit entry");
+                        }
+
+                        else {
+                            Log.d("Option 3", "Delete the game");
+                            showDeleteDialog(view, game);
+                        }
+                    }
+                });
+                mBuilder.show();
                 return false;
             }
-        });*/
+        });
     }
 
     // Return the size of the data set (invoked by LayoutManager)
@@ -150,6 +176,34 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         }
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+    /** Alert Dialogs */
+
+    private void showDeleteDialog(final View v, final Game game) {
+        final Context context = v.getContext();
+        final MySQLiteHelper db = new MySQLiteHelper(context);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+
+        String deleteTitle = "Deleting " + game.getTitle() + "...";
+        final String confirmDelete = "Successfully deleted " + game.getTitle() + ".";
+        mBuilder.setTitle(deleteTitle)
+                .setMessage(R.string.delete_confirm)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db.deleteGame(game);
+                        Snackbar.make(v, confirmDelete, Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .create()
+                .show();
     }
 
 /*    public String getRateString(String unit, int rate) {
