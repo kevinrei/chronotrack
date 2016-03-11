@@ -1,8 +1,10 @@
 package com.kevinrei.chronotrack;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MotionEventCompat;
@@ -13,7 +15,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -23,6 +27,20 @@ import java.util.List;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         implements SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
+
+    public static class Action {
+        public final int icon;
+        public final String action;
+        public Action(Integer icon, String action) {
+            this.icon = icon;
+            this.action = action;
+        }
+
+        @Override
+        public String toString() {
+            return action;
+        }
+    }
 
     public interface OnStartDragListener {
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
@@ -113,21 +131,48 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             public boolean onLongClick(View v) {
                 final View view = v;
 
-                CharSequence[] options = new CharSequence[] {
-                        "Create an alarm",
-                        "Edit entry",
-                        "Delete the game"
+                final Action[] actions = {
+                        new Action(R.drawable.ic_add_alarm, "Create Alarm"),
+                        new Action(R.drawable.ic_mode_edit, "Edit"),
+                        new Action(R.drawable.ic_delete, "Delete")
                 };
 
+                TypedArray typedArray = v.getContext().obtainStyledAttributes(null,
+                        R.styleable.AlertDialog, R.attr.alertDialogStyle, 0);
+
+                ListAdapter adapter = new ArrayAdapter<Action>(v.getContext(),
+                        typedArray.getResourceId(R.styleable.AlertDialog_listItemLayout, 0),
+                        android.R.id.text1, actions){
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        //Use super class to create the View
+                        View v = super.getView(position, convertView, parent);
+                        TextView tv = (TextView) v.findViewById(android.R.id.text1);
+
+                        //Put the image on the TextView
+                        tv.setCompoundDrawablesWithIntrinsicBounds(actions[position].icon, 0, 0, 0);
+
+                        //Add margin between image and text (support various screen densities)
+                        int dp8 = (int) (8 * v.getContext().getResources().getDisplayMetrics().density);
+                        tv.setCompoundDrawablePadding(dp8);
+
+                        return v;
+                    }
+                };
+
+                typedArray.recycle();
+
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
-                mBuilder.setTitle("Select an action");
+                mBuilder.setTitle(game.getTitle());
+                mBuilder.setCancelable(false);
+
                 mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
-                mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+
+                mBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
@@ -144,6 +189,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                         }
                     }
                 });
+
                 mBuilder.show();
                 return false;
             }

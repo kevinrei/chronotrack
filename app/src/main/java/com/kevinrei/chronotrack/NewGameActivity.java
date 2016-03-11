@@ -230,12 +230,15 @@ public class NewGameActivity extends AppCompatActivity {
 
             AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
             mBuilder.setTitle("Icon options");
+            mBuilder.setCancelable(false);
+
             mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
                 }
             });
+
             mBuilder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -250,6 +253,7 @@ public class NewGameActivity extends AppCompatActivity {
                     }
                 }
             });
+
             mBuilder.show();
         }
     };
