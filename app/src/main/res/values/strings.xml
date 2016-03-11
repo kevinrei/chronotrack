@@ -35,10 +35,13 @@
     <string name="reorder_handle">Reorder</string>
     <string name="delete_confirm">Are you sure you want to delete this game?</string>
 
+    <!-- Game Detail -->
+    <string name="lbl_max">Maximum value:</string>
+    <string name="lbl_rcv_rate">Recovery rate:</string>
+    <string name="lbl_full_rcv">Full recovery:</string>
 
 
-    <string name="game_rate">Recovery rate: 1 Unit / Rate</string>
-    <string name="game_max">Maximum stamina value:</string>
+
     <string name="alarms_list">This is a list of alarms.</string>
     <string name="timer_text">This is a timer.</string>
 

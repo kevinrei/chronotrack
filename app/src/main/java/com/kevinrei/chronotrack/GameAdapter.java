@@ -1,6 +1,5 @@
 package com.kevinrei.chronotrack;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -251,38 +250,4 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 .create()
                 .show();
     }
-
-/*    public String getRateString(String unit, int rate) {
-        String result, timeUnit, rateValueString;
-        int rateValue;
-
-        rateValue = rate / 60;
-
-        // Get the unit of time measurement
-        if (rateValue == 1) {
-            timeUnit = "minute";
-        } else if (rateValue < 60) {
-            timeUnit = "minutes";
-        } else if (rateValue == 60) {
-            rateValue /= 60;
-            timeUnit = "hour";
-        } else {
-            rateValue /= 60;
-            timeUnit = "hours";
-        }
-
-        // Remove number if it's 1 minute or 1 hour
-        if (rateValue == 1) {
-            rateValueString = "";
-        } else {
-            rateValueString = String.valueOf(rateValue);
-        }
-
-        result = "Recovery rate: 1 " + unit + " every " + rateValueString + " " + timeUnit;
-        return result;
-    }
-
-    public String getMaxString(int max) {
-        return "Maximum stamina value: " + max;
-    }*/
 }

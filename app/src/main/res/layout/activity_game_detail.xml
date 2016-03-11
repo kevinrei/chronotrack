@@ -38,10 +38,94 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         style="@style/Margin" >
 
-        <TextView
-            android:id="@+id/game_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <RelativeLayout
+            android:id="@+id/layout_mobile_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/layout_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_max" />
+
+                <TextView
+                    android:id="@+id/tv_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/spacing"
+                    android:layout_marginStart="@dimen/spacing"
+                    android:textColor="@color/textIcons" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout_max"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_rcv_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_rcv_rate" />
+
+                <TextView
+                    android:id="@+id/tv_rcv_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/spacing"
+                    android:layout_marginStart="@dimen/spacing"
+                    android:textColor="@color/textIcons" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_rcv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing"
+                android:layout_below="@+id/layout_rate"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_full_rcv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_full_rcv" />
+
+                <TextView
+                    android:id="@+id/tv_full_rcv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/spacing"
+                    android:layout_marginStart="@dimen/spacing"
+                    android:textColor="@color/textIcons" />
+
+            </LinearLayout>
+
+            <View style="@style/Divider"
+                android:layout_below="@+id/layout_rcv" />
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_alarms"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/spacing"
+            android:fitsSystemWindows="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
     </LinearLayout>
 
