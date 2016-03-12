@@ -118,7 +118,7 @@ public class GameDetailActivity extends AppCompatActivity {
 
         // Full recovery time
         mFullRecovery.setText(calculateTime(gameRate * gameMax));
-        
+
         initDataSet();
 
         mRecyclerView.setHasFixedSize(true);
@@ -154,6 +154,10 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_edit) {
+            Intent i = new Intent(this, NewGameActivity.class);
+            i.putExtra("flag", 2);
+            i.putExtra("game", game);
+            this.startActivity(i);
             return true;
         }
 

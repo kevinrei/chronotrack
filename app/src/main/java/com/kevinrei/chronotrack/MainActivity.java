@@ -30,10 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /** App info */
-    String selectedTitle;
-    String selectedIcon;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,12 +124,9 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_INSTALLED_APP) {
-                selectedTitle = data.getStringExtra("app_title");
-                selectedIcon = data.getStringExtra("app_icon");
-                Intent addGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
-                addGameIntent.putExtra("app_title", selectedTitle);
-                addGameIntent.putExtra("app_icon", selectedIcon);
-                startActivityForResult(addGameIntent, ADD_NEW_GAME);
+                Intent i = new Intent(MainActivity.this, NewGameActivity.class);+
+                i.putExtras(data);
+                startActivityForResult(i, ADD_NEW_GAME);
             }
 
             else if (requestCode == ADD_NEW_GAME) {

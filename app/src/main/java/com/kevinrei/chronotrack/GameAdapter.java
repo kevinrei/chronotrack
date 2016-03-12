@@ -160,6 +160,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
                 typedArray.recycle();
 
+                final Context context = v.getContext();
+
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
                 mBuilder.setTitle(game.getTitle());
                 mBuilder.setCancelable(false);
@@ -180,6 +182,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
                         else if (which == 1) {
                             Log.d("Option 2", "Edit entry");
+                            Intent i = new Intent(context, NewGameActivity.class);
+                            i.putExtra("flag", 2);
+                            i.putExtra("game", game);
+                            context.startActivity(i);
                         }
 
                         else {

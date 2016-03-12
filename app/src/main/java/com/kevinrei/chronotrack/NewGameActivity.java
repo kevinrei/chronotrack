@@ -32,6 +32,7 @@ import com.soundcloud.android.crop.Crop;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class NewGameActivity extends AppCompatActivity {
@@ -41,7 +42,9 @@ public class NewGameActivity extends AppCompatActivity {
 
     /** Database and data values*/
     private MySQLiteHelper db;
+    private int flag;
 
+    int appId;
     String gameTitle;
     String gameImage;
     String gameCategory;
@@ -50,14 +53,14 @@ public class NewGameActivity extends AppCompatActivity {
     int maxStamina;
 
     /** Widgets and Fields */
-    View mView;
-    LinearLayout mMobileLayout;
-    EditText mTitle;
-    ImageView mImage;
-    Spinner mCategory;
-    EditText mUnit;
-    Spinner mRecovery;
-    EditText mStamina;
+    protected View mView;
+    protected LinearLayout mMobileLayout;
+    protected EditText mTitle;
+    protected ImageView mImage;
+    protected Spinner mCategory;
+    protected EditText mUnit;
+    protected Spinner mRecovery;
+    protected EditText mStamina;
 
     /** Image */
     private String imgContent = "";
@@ -67,8 +70,6 @@ public class NewGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
         mView = findViewById(R.id.main_content);
-
-        Intent i = getIntent();
 
         db = new MySQLiteHelper(this);
 
@@ -89,18 +90,12 @@ public class NewGameActivity extends AppCompatActivity {
         mRecovery = (Spinner) findViewById(R.id.spn_rate);
         mStamina = (EditText) findViewById(R.id.hint_max);
 
-        // If i is not null, then an installed app was selected
-        String appTitle = i.getStringExtra("app_title");
-        String appIcon = i.getStringExtra("app_icon");
-
-        if (appTitle != null && appIcon != null) {
-            mTitle.setText(appTitle);
-
-            imgContent = appIcon;
-            Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
-
-            mCategory.setEnabled(false);
-        }
+        // Get the intent and its flag, which is 1 or 2.
+        // 1 means an installed activity is being added.
+        // 2 means a game detail is being edited.
+        Intent i = getIntent();
+        flag = i.getIntExtra("flag", 0);
+        Log.d("flag", String.valueOf(flag));
 
         mImage.setOnClickListener(mImageClickListener);
 
@@ -109,14 +104,35 @@ public class NewGameActivity extends AppCompatActivity {
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategory.setAdapter(categoryAdapter);
 
-        // Do not show Snackbar when activity is created
-        mCategory.setSelection(0, false);
-        mCategory.setOnItemSelectedListener(mMobileListener);
-
         ArrayAdapter<CharSequence> rateAdapter = ArrayAdapter.createFromResource(
                 this, R.array.recovery_rate_array, android.R.layout.simple_spinner_item);
         rateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mRecovery.setAdapter(rateAdapter);
+
+        if (flag == 1) {
+            // An installed app was selected
+            String appTitle = i.getStringExtra("app_title");
+            String appIcon = i.getStringExtra("app_icon");
+
+            mTitle.setText(appTitle);
+
+            imgContent = appIcon;
+            Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
+
+            mCategory.setEnabled(false);
+        }
+
+        else if (flag == 2) {
+            // A game is being edited
+            toolbar.setTitle("Edit Game");
+            getExistingGameData(i);
+        }
+
+        // Do not show Snackbar when activity is created
+        else {
+            mCategory.setSelection(0, false);
+            mCategory.setOnItemSelectedListener(mMobileListener);
+        }
     }
 
     @Override
@@ -301,6 +317,46 @@ public class NewGameActivity extends AppCompatActivity {
         return mRateValueArray[rate.getSelectedItemPosition()];
     }
 
+    private void getExistingGameData(Intent i) {
+        Game game = (Game) i.getSerializableExtra("game");
+
+        appId = game.getId();
+        String appTitle = game.getTitle();
+        String appIcon = game.getImage();
+        String appCategory = game.getCategory();
+
+        Log.d("Category", appCategory);
+
+        if (appCategory.equals("Mobile game")) {
+            String appUnit = game.getUnit();
+            int appRecovery = game.getRecoveryRate();
+            int appMax = game.getMaxStamina();
+
+            mUnit.setText(appUnit);
+            mRecovery.setSelection(getArrayPosition(appRecovery));
+            mStamina.setText(String.valueOf(appMax));
+        }
+
+        mTitle.setText(appTitle);
+
+        imgContent = appIcon;
+        Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
+
+        String[] categoryArray = getResources().getStringArray(R.array.category_array);
+        mCategory.setSelection(Arrays.asList(categoryArray).indexOf(appCategory), false);
+    }
+
+    private int getArrayPosition(int value) {
+        int[] recoveryArray = getResources().getIntArray(R.array.recovery_rate_value_array);
+
+        Integer[] retrievableArray = new Integer[recoveryArray.length];
+        for (int i = 0; i < recoveryArray.length; i++) {
+            retrievableArray[i] = recoveryArray[i];
+        }
+
+        return Arrays.asList(retrievableArray).indexOf(value);
+    }
+
     // Update the database with the new game
     private void updateGameLibrary() {
         // Title
@@ -342,7 +398,11 @@ public class NewGameActivity extends AppCompatActivity {
         game.setRecoveryRate(recoveryRate);
         game.setMaxStamina(maxStamina);
 
-        db.addGame(game);
+        if (flag == 2) {
+            db.updateGame(game, appId);
+        } else {
+            db.addGame(game);
+        }
     }
 
     private void checkExternalPermissionThenStart() {

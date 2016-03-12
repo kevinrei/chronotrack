@@ -48,6 +48,8 @@ public class InstalledAppActivity extends AppCompatActivity {
                 ApplicationInfo app = installedApps.get(position);
                 Intent i = new Intent();
 
+                i.putExtra("flag", 1);
+
                 i.putExtra("app_title", app.loadLabel(pm).toString());
 
                 String icon = "android.resource://" + app.packageName + "/" + app.icon;

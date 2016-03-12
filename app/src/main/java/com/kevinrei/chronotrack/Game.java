@@ -1,6 +1,8 @@
 package com.kevinrei.chronotrack;
 
-public class Game {
+import java.io.Serializable;
+
+public class Game implements Serializable {
     private int id;
     private String title;
     private String image;

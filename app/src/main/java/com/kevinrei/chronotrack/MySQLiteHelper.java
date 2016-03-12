@@ -170,7 +170,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Update the game details
-    public void updateGame(Game game) {
+    public void updateGame(Game game, int appId) {
         // Get reference to a writable database
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -187,7 +187,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.update(TABLE_GAMES,                                  // table
                 values,                                         // values
                 KEY_ID + " = ?",                                // selections
-                new String[]{String.valueOf(game.getId())});    // selection arguments
+                new String[]{String.valueOf(appId)});    // selection arguments
 
         // Close the database
         db.close();
