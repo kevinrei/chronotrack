@@ -286,9 +286,6 @@ public class NewGameActivity extends AppCompatActivity {
             else {
                 mMobileLayout.setVisibility(View.GONE);
             }
-
-            Snackbar.make(view, mCategory.getItemAtPosition(position) + " selected.",
-                    Snackbar.LENGTH_SHORT).show();
         }
 
         @Override

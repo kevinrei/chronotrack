@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_INSTALLED_APP) {
-                Intent i = new Intent(MainActivity.this, NewGameActivity.class);+
+                Intent i = new Intent(MainActivity.this, NewGameActivity.class);
                 i.putExtras(data);
                 startActivityForResult(i, ADD_NEW_GAME);
             }
