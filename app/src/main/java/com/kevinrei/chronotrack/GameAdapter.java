@@ -178,6 +178,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
                             Log.d("Option 1", "Create an alarm");
+                            Intent i = new Intent(context, AddAlarmActivity.class);
+                            i.putExtra("game", game);
+                            context.startActivity(i);
                         }
 
                         else if (which == 1) {
@@ -196,7 +199,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 });
 
                 mBuilder.show();
-                return false;
+                return true;
             }
         });
     }

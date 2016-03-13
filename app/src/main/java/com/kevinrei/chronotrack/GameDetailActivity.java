@@ -150,6 +150,9 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_add_alarm) {
+            Intent i = new Intent(this, AddAlarmActivity.class);
+            i.putExtra("game", game);
+            startActivity(i);
             return true;
         }
 
@@ -157,7 +160,7 @@ public class GameDetailActivity extends AppCompatActivity {
             Intent i = new Intent(this, NewGameActivity.class);
             i.putExtra("flag", 2);
             i.putExtra("game", game);
-            this.startActivity(i);
+            startActivity(i);
             return true;
         }
 

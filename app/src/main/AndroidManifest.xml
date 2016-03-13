@@ -34,10 +34,22 @@
         <activity android:name=".InstalledAppActivity"
             android:label="@string/installed_app"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
 
         <activity android:name=".GameDetailActivity"
             android:label="@string/hint_title"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity android:name=".NewGameActivity"
+            android:label="@string/new_game_activity"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".MainActivity" >
             <meta-data
