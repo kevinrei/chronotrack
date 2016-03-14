@@ -48,8 +48,8 @@
                 android:value=".MainActivity" />
         </activity>
 
-        <activity android:name=".NewGameActivity"
-            android:label="@string/new_game_activity"
+        <activity android:name=".AddAlarmActivity"
+            android:label="@string/create_alarm"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".MainActivity" >
             <meta-data

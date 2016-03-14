@@ -4,6 +4,7 @@
     <string name="app_name">ChronoTrack</string>
     <string name="new_game_activity">Add New Game</string>
     <string name="installed_app">Select Installed Application</string>
+    <string name="create_alarm">Create New Alarm</string>
 
     <!-- Menu -->
     <string name="action_about">About</string>
@@ -40,7 +41,24 @@
     <string name="lbl_rcv_rate">Recovery rate:</string>
     <string name="lbl_full_rcv">Full recovery:</string>
 
-
+    <!-- Create New Alarm -->
+    <string name="switch_stamina">Stamina</string>
+    <string name="switch_condition">Condition</string>
+    <string name="calculate_text">Calculate stamina recovery time</string>
+    <string name="lbl_current">Current</string>
+    <string name="arrow">&gt;&gt;</string>
+    <string name="lbl_goal">Goal</string>
+    <string name="alarm_label">Label</string>
+    <string name="check_delete">Delete after alarm triggered</string>
+    <string name="condition_text">Set an alarm condition</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
+    <string name="set_datetime">Date &amp; Time</string>
+    <string name="set_countdown">Countdown</string>
+    <string name="filler_date">01/23/1992</string>
+    <string name="filler_time">6:00 PM</string>
+    <string name="remind_me">Remind me in&#8230;</string>
+    <string name="filler_reminder">24h 60m 60s</string>
 
     <string name="alarms_list">This is a list of alarms.</string>
     <string name="timer_text">This is a timer.</string>

@@ -72,7 +72,7 @@
                     android:id="@+id/spn_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing"
+                    android:layout_marginTop="@dimen/margin_small"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
                     android:layout_below="@+id/lbl_category" />
@@ -85,7 +85,7 @@
             android:id="@+id/hint_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing"
+            android:layout_marginBottom="@dimen/margin_small"
             android:hint="@string/hint_title"
             android:singleLine="true" />
 
@@ -99,7 +99,7 @@
                 android:id="@+id/hint_unit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:hint="@string/hint_unit" />
 
             <RelativeLayout
@@ -113,7 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/spn_rate"
                     android:layout_alignStart="@+id/spn_rate"
-                    android:layout_marginTop="@dimen/spacing"
+                    android:layout_marginTop="@dimen/margin_small"
                     android:text="@string/lbl_rate"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -121,8 +121,8 @@
                     android:id="@+id/spn_rate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing"
-                    android:layout_marginBottom="@dimen/spacing"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"
                     android:layout_below="@+id/lbl_rate"/>
 
             </RelativeLayout>

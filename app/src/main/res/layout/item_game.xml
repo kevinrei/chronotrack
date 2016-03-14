@@ -32,8 +32,8 @@
             android:text="@string/game_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/spacing"
-            android:layout_marginEnd="@dimen/spacing"
+            android:layout_marginRight="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/margin_small"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 

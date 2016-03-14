@@ -59,8 +59,8 @@
                     android:id="@+id/tv_max"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/spacing"
-                    android:layout_marginStart="@dimen/spacing"
+                    android:layout_marginLeft="@dimen/margin_small"
+                    android:layout_marginStart="@dimen/margin_small"
                     android:textColor="@color/textIcons" />
 
             </LinearLayout>
@@ -82,8 +82,8 @@
                     android:id="@+id/tv_rcv_rate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/spacing"
-                    android:layout_marginStart="@dimen/spacing"
+                    android:layout_marginLeft="@dimen/margin_small"
+                    android:layout_marginStart="@dimen/margin_small"
                     android:textColor="@color/textIcons" />
 
             </LinearLayout>
@@ -92,7 +92,7 @@
                 android:id="@+id/layout_rcv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:layout_below="@+id/layout_rate"
                 android:orientation="horizontal">
 
@@ -106,8 +106,8 @@
                     android:id="@+id/tv_full_rcv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/spacing"
-                    android:layout_marginStart="@dimen/spacing"
+                    android:layout_marginLeft="@dimen/margin_small"
+                    android:layout_marginStart="@dimen/margin_small"
                     android:textColor="@color/textIcons" />
 
             </LinearLayout>
@@ -121,7 +121,7 @@
             android:id="@+id/recycler_alarms"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/spacing"
+            android:layout_marginTop="@dimen/margin_small"
             android:fitsSystemWindows="true"
             android:clickable="true"
             android:focusable="true"
