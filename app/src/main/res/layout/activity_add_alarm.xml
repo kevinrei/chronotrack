@@ -282,7 +282,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/margin_small"
                         android:layout_marginStart="@dimen/margin_small"
-                        android:text="@string/filler_reminder"
+                        android:text="@string/default_reminder"
                         android:textColor="@color/textIcons"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 

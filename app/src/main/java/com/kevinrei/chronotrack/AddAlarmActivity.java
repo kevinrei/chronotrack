@@ -3,13 +3,16 @@ package com.kevinrei.chronotrack;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,10 +80,13 @@ public class AddAlarmActivity extends AppCompatActivity {
     final Calendar c = Calendar.getInstance();
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
     SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+    SimpleDateFormat sdfReminder = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
 
     String goalDate;
     String goalTime;
-    String conditionDateTime;
+    String goalReminder;
+
+    long reminderValue;
 
     int mYear;
     int mMonth;
@@ -169,8 +175,25 @@ public class AddAlarmActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (id == R.id.action_save) {
-            Date example = getGoal(goalDate, goalTime);
-            Log.d("Example", example.toString());
+            if (layoutFlag == LAYOUT_STAMINA) {
+                int currentStamina = mCurrentPicker.getValue();
+                int goalStamina = mGoalPicker.getValue();
+            }
+
+            else if (layoutFlag == LAYOUT_CONDITION) {
+                Date conditionGoal = getGoal(goalDate, goalTime);
+                long conditionGoalValue = conditionGoal.getTime();
+            }
+
+            String alarmLabel;
+            if (isEmpty(mAlarmLabel)) {
+                alarmLabel = "";
+            } else {
+                alarmLabel = mAlarmLabel.getText().toString();
+            }
+
+            boolean deleteAfter = mCheckDelete.isChecked();
+
             return true;
         }
 
@@ -181,6 +204,7 @@ public class AddAlarmActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
+
 
     /** Custom methods */
 
@@ -257,6 +281,70 @@ public class AddAlarmActivity extends AppCompatActivity {
         mCurrentTimeText.setText(goalTime);
     }
 
+    private void showSetCountdownDialog() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        LayoutInflater mInflater = this.getLayoutInflater();
+        final View mDialogView = mInflater.inflate(R.layout.dialog_reminder_countdown, null);
+        mBuilder.setView(mDialogView);
+
+        final NumberPicker pickHour = (NumberPicker) mDialogView.findViewById(R.id.picker_hr);
+        final NumberPicker pickMinute = (NumberPicker) mDialogView.findViewById(R.id.picker_min);
+        final NumberPicker pickSecond = (NumberPicker) mDialogView.findViewById(R.id.picker_sec);
+
+        // Max value for hours is 7 days
+        String[] valuesHour = new String[169];
+        for (int i = 0; i < valuesHour.length; i++) {
+            valuesHour[i] = Integer.toString(i);
+        }
+
+        String[] valuesMS = new String[60];
+        for (int i = 0; i < valuesMS.length; i++) {
+            valuesMS[i] = Integer.toString(i);
+        }
+
+        pickHour.setMinValue(0);
+        pickHour.setMaxValue(168);
+        pickHour.setDisplayedValues(valuesHour);
+        pickHour.setWrapSelectorWheel(false);
+
+        pickMinute.setMinValue(0);
+        pickMinute.setMaxValue(59);
+        pickMinute.setDisplayedValues(valuesMS);
+
+        pickSecond.setMinValue(0);
+        pickSecond.setMaxValue(59);
+        pickSecond.setDisplayedValues(valuesMS);
+
+        mBuilder.setTitle("Set Countdown Time")
+                .setCancelable(false)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int seconds = pickSecond.getValue();
+                        int minutes = pickMinute.getValue();
+                        int hours = pickHour.getValue();
+
+                        reminderValue = (hours * 60 * 60 * 1000)
+                                + (minutes * 60 * 1000)
+                                + (seconds * 1000);
+
+                        goalReminder = String.format(Locale.getDefault(),
+                                "%02dh %02dm %02ds", hours, minutes, seconds);
+
+                        Log.d("Goal", goalReminder);
+                        Log.d("Reminder", String.valueOf(reminderValue));
+
+                        mCurrentReminderText.setText(goalReminder);
+                    }
+                }).show();
+    }
+
     private String formatTime(int hourOfDay, int minute) {
         String formatted;
         String min;
@@ -300,6 +388,12 @@ public class AddAlarmActivity extends AppCompatActivity {
 
         return goal;
     }
+
+    // Check if the EditText field is empty
+    private boolean isEmpty(EditText editText) {
+        return editText.getText().toString().trim().length() == 0;
+    }
+
 
     /** Listeners */
 
@@ -347,6 +441,7 @@ public class AddAlarmActivity extends AppCompatActivity {
                     break;
 
                 case R.id.btn_set_reminder:
+                    showSetCountdownDialog();
                     break;
             }
         }

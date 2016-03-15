@@ -56,7 +56,10 @@
     <string name="filler_date">01/23/1992</string>
     <string name="filler_time">6:00 PM</string>
     <string name="remind_me">Remind me in&#8230;</string>
-    <string name="filler_reminder">24h 60m 60s</string>
+    <string name="default_reminder">0h 00m 00s</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
     <string name="alarm_label">Label</string>
     <string name="check_delete">Delete after alarm triggered</string>
 
