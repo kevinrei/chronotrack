@@ -186,10 +186,10 @@ public class AddAlarmActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (id == R.id.action_save) {
-            int staminaFullTime;        // Minutes until stamina is full
-            long alarmTriggerTime;      // When the alarm should be triggered
-            String alarmLabel;          // The alarm's label
-            boolean deleteAfter;
+            int staminaFullTime = -1;        // Minutes until stamina is full
+            long alarmTriggerTime = -1;      // When the alarm should be triggered
+            String alarmLabel;               // The alarm's label
+            boolean deleteAfter = true;      // Delete the alarm after it's been triggered
 
             Log.d("layout", String.valueOf(layoutFlag));
 
@@ -224,6 +224,8 @@ public class AddAlarmActivity extends AppCompatActivity {
             } else {
                 alarmLabel = mAlarmLabel.getText().toString();
             }
+
+            int deleteAfterFlag = (deleteAfter) ? 1 : 0;
 
             return true;
         }
