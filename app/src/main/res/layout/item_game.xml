@@ -25,6 +25,7 @@
         android:layout_toStartOf="@+id/reorder_handle"
         android:layout_toRightOf="@+id/game_img"
         android:layout_toEndOf="@+id/game_img"
+        android:layout_centerVertical="true"
         android:orientation="vertical" >
 
         <TextView

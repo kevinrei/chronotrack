@@ -32,8 +32,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ViewSwitcher;
 
-import org.joda.time.Seconds;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -60,7 +58,7 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected Switch mSwitch;
     protected TextView mStaminaLabel;
     protected EditText mAlarmLabel;
-    protected CheckBox mCheckDelete;
+    protected CheckBox mCheckSave;
 
     /** Stamina Layout */
     protected TextView mCalcUnit;
@@ -84,7 +82,6 @@ public class AddAlarmActivity extends AppCompatActivity {
 
     /** Date & Time */
     final Calendar c = Calendar.getInstance();
-    Date today = c.getTime();
     SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
     SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
@@ -128,13 +125,13 @@ public class AddAlarmActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (!isChecked) {
                     layoutFlag = LAYOUT_STAMINA;
-                    mCheckDelete.setVisibility(View.VISIBLE);
+                    mCheckSave.setVisibility(View.VISIBLE);
                 } else {
                     layoutFlag = LAYOUT_CONDITION_DATETIME;
                     if (isDateTimeCountdown) {
-                        mCheckDelete.setVisibility(View.GONE);
+                        mCheckSave.setVisibility(View.GONE);
                     } else {
-                        mCheckDelete.setVisibility(View.VISIBLE);
+                        mCheckSave.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -143,7 +140,7 @@ public class AddAlarmActivity extends AppCompatActivity {
         mStaminaLabel = (TextView) findViewById(R.id.lbl_stamina_layout);
 
         mAlarmLabel = (EditText) findViewById(R.id.alarm_label);
-        mCheckDelete = (CheckBox) findViewById(R.id.cb_delete);
+        mCheckSave = (CheckBox) findViewById(R.id.cb_save);
 
         initStaminaLayout();
         initConditionLayout();
@@ -186,16 +183,17 @@ public class AddAlarmActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (id == R.id.action_save) {
+            String gameTitle = game.getTitle();
             int staminaFullTime = -1;        // Minutes until stamina is full
             long alarmTriggerTime = -1;      // When the alarm should be triggered
             String alarmLabel;               // The alarm's label
-            boolean deleteAfter = true;      // Delete the alarm after it's been triggered
+            boolean saveAfter = false;      // Delete the alarm after it's been triggered
 
             Log.d("layout", String.valueOf(layoutFlag));
 
             if (layoutFlag == LAYOUT_STAMINA) {
                 staminaFullTime = mGoalPicker.getValue() - mCurrentPicker.getValue();
-                deleteAfter = mCheckDelete.isChecked();
+                saveAfter = mCheckSave.isChecked();
             }
 
             else if (layoutFlag == LAYOUT_CONDITION_DATETIME) {
@@ -211,21 +209,32 @@ public class AddAlarmActivity extends AppCompatActivity {
                     return false;
                 }
 
-                deleteAfter = true;
+                saveAfter = false;
             }
 
             else if (layoutFlag == LAYOUT_CONDITION_COUNTDOWN) {
                 alarmTriggerTime = reminderValue;
-                deleteAfter = mCheckDelete.isChecked();
+                saveAfter = mCheckSave.isChecked();
             }
 
             if (isEmpty(mAlarmLabel)) {
-                alarmLabel = "";
+                alarmLabel = "Label";
             } else {
                 alarmLabel = mAlarmLabel.getText().toString();
             }
 
-            int deleteAfterFlag = (deleteAfter) ? 1 : 0;
+            int saveAfterFlag = (saveAfter) ? 1 : 0;
+
+            Alarm alarm = new Alarm();
+
+            alarm.setGame(gameTitle);
+            alarm.setFlag(layoutFlag);
+            alarm.setFull(staminaFullTime);
+            alarm.setTrigger(alarmTriggerTime);
+            alarm.setLabel(alarmLabel);
+            alarm.setSave(saveAfterFlag);
+
+            db.addAlarm(alarm);
 
             return true;
         }
@@ -300,13 +309,13 @@ public class AddAlarmActivity extends AppCompatActivity {
                     layoutFlag = LAYOUT_CONDITION_DATETIME;
                     mDateTimeLayout.setVisibility(View.VISIBLE);
                     mCountdownLayout.setVisibility(View.GONE);
-                    mCheckDelete.setVisibility(View.GONE);
+                    mCheckSave.setVisibility(View.GONE);
                 } else {
                     isDateTimeCountdown = false;
                     layoutFlag = LAYOUT_CONDITION_COUNTDOWN;
                     mDateTimeLayout.setVisibility(View.GONE);
                     mCountdownLayout.setVisibility(View.VISIBLE);
-                    mCheckDelete.setVisibility(View.VISIBLE);
+                    mCheckSave.setVisibility(View.VISIBLE);
                 }
             }
         });

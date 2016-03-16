@@ -37,7 +37,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_FULL = "full";                  // Stamina difference
     private static final String KEY_TRIGGER = "trigger";            // Trigger time
     private static final String KEY_LABEL = "label";                // Alarm label
-    private static final String KEY_DELETE = "delete";              // Delete or keep
+    private static final String KEY_SAVE = "save";                  // Save or delete
 
     private static final String[] COLUMNS_GAMES = {
             KEY_ID,
@@ -56,7 +56,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             KEY_FULL,
             KEY_TRIGGER,
             KEY_LABEL,
-            KEY_DELETE
+            KEY_SAVE
     };
 
     public MySQLiteHelper(Context context) {
@@ -81,7 +81,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 KEY_FULL + " INTEGER, " +
                 KEY_TRIGGER + " INTEGER, " +
                 KEY_LABEL + " TEXT, " +
-                KEY_DELETE + " INTEGER ); ";
+                KEY_SAVE + " INTEGER ); ";
 
         // create names table
         db.execSQL(CREATE_GAMES_TABLE);
@@ -252,7 +252,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_FULL, alarm.getFull());
         values.put(KEY_TRIGGER, alarm.getTrigger());
         values.put(KEY_LABEL, alarm.getLabel());
-        values.put(KEY_DELETE, alarm.getDelete());
+        values.put(KEY_SAVE, alarm.getSave());
 
         // Insert to database
         db.insert(TABLE_ALARMS, null, values);
@@ -289,7 +289,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         alarm.setFull(Integer.parseInt(cursor.getString(3)));
         alarm.setTrigger(Long.parseLong(cursor.getString(4)));
         alarm.setLabel(cursor.getString(5));
-        alarm.setDelete(Integer.parseInt(cursor.getString(6)));
+        alarm.setSave(Integer.parseInt(cursor.getString(6)));
 
         cursor.close();
 
@@ -321,7 +321,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 alarm.setFull(Integer.parseInt(cursor.getString(3)));
                 alarm.setTrigger(Long.parseLong(cursor.getString(4)));
                 alarm.setLabel(cursor.getString(5));
-                alarm.setDelete(Integer.parseInt(cursor.getString(6)));
+                alarm.setSave(Integer.parseInt(cursor.getString(6)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -366,7 +366,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 alarm.setFull(Integer.parseInt(cursor.getString(3)));
                 alarm.setTrigger(Long.parseLong(cursor.getString(4)));
                 alarm.setLabel(cursor.getString(5));
-                alarm.setDelete(Integer.parseInt(cursor.getString(6)));
+                alarm.setSave(Integer.parseInt(cursor.getString(6)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -395,7 +395,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_FULL, alarm.getFull());
         values.put(KEY_TRIGGER, alarm.getTrigger());
         values.put(KEY_LABEL, alarm.getLabel());
-        values.put(KEY_DELETE, alarm.getDelete());
+        values.put(KEY_SAVE, alarm.getSave());
 
         // Update the row
         db.update(TABLE_ALARMS,                             // table

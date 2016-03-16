@@ -53,15 +53,18 @@
     <string name="set_time">Set Time</string>
     <string name="set_datetime">Date &amp; Time</string>
     <string name="set_countdown">Countdown</string>
-    <string name="filler_date">01/23/1992</string>
-    <string name="filler_time">6:00 PM</string>
+    <string name="filler_date">MM/dd/yyyy</string>
+    <string name="filler_time">hh:mm a</string>
     <string name="remind_me">Remind me in&#8230;</string>
     <string name="default_reminder">00h 00m 00s</string>
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="seconds">Seconds</string>
     <string name="alarm_label">Label</string>
-    <string name="check_delete">Delete after alarm triggered</string>
+    <string name="check_save">Save this alarm</string>
+
+    <!-- Alarm List Item -->
+    <string name="lbl_alarm">Label</string>
 
     <string name="alarms_list">This is a list of alarms.</string>
     <string name="timer_text">This is a timer.</string>

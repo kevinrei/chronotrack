@@ -7,11 +7,11 @@ public class Alarm {
     private int full;           // Stamina difference
     private long trigger;       // Trigger time
     private String label;       // Alarm label
-    private int delete;         // Keep (0) or delete (1)
+    private int save;           // Save (1) or delete (0)
 
     public Alarm() {}
 
-    public Alarm(int aid, String game, int flag, int full, long trigger, String label, int delete) {
+    public Alarm(int aid, String game, int flag, int full, long trigger, String label, int save) {
         super();
         this.aid = aid;
         this.game = game;
@@ -19,7 +19,7 @@ public class Alarm {
         this.full = full;
         this.trigger = trigger;
         this.label = label;
-        this.delete = delete;
+        this.save = save;
     }
 
     /** Getters & setters */
@@ -32,7 +32,7 @@ public class Alarm {
                 "full="         + full      + ", " +
                 "trigger="      + trigger   + ", " +
                 "label="        + label     + ", " +
-                "delete="       + delete    + "]";
+                "save="         + save      + "]";
     }
 
     public int getAid() { return aid; }
@@ -41,7 +41,7 @@ public class Alarm {
     public int getFull() { return full; }
     public long getTrigger() { return trigger; }
     public String getLabel() { return label; }
-    public int getDelete() { return delete; }
+    public int getSave() { return save; }
 
     public void setAid(int aid) { this.aid = aid; }
     public void setGame(String game) { this.game = game; }
@@ -49,5 +49,5 @@ public class Alarm {
     public void setFull(int full) { this.full = full; }
     public void setTrigger(long trigger) { this.trigger = trigger; }
     public void setLabel(String label) { this.label = label; }
-    public void setDelete(int delete) { this.delete = delete; }
+    public void setSave(int save) { this.save = save; }
 }
