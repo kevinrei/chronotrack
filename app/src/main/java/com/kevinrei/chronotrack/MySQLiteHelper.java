@@ -50,6 +50,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     };
 
     private static final String[] COLUMNS_ALARMS = {
+            KEY_ID,
             KEY_AID,
             KEY_GAME,
             KEY_FLAG,
@@ -76,7 +77,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 KEY_MAX_STAMINA + " INTEGER ); ";
 
         String CREATE_ALARMS_TABLE = "CREATE TABLE " + TABLE_ALARMS + " (" +
-                KEY_AID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                KEY_AID + " INTEGER, " +
                 KEY_GAME + " TEXT, " +
                 KEY_FLAG + " INTEGER, " +
                 KEY_FULL + " INTEGER, " +
@@ -285,6 +287,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
+        values.put(KEY_AID, alarm.getAid());
         values.put(KEY_GAME, alarm.getGame());
         values.put(KEY_FLAG, alarm.getFlag());
         values.put(KEY_FULL, alarm.getFull());
@@ -309,7 +312,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Build the query
         Cursor cursor = db.query(TABLE_ALARMS,          // table
                 COLUMNS_ALARMS,                         // column names
-                " id = ?",                              // selections
+                " aid = ?",                             // selections
                 new String[] { String.valueOf(aid) },   // selection arguments
                 null,                                   // group by
                 null,                                   // having
@@ -321,13 +324,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // Build the Alarm object
         Alarm alarm = new Alarm();
-        alarm.setAid(Integer.parseInt(cursor.getString(0)));
-        alarm.setGame(cursor.getString(1));
-        alarm.setFlag(Integer.parseInt(cursor.getString(2)));
-        alarm.setFull(Integer.parseInt(cursor.getString(3)));
-        alarm.setTrigger(Long.parseLong(cursor.getString(4)));
-        alarm.setLabel(cursor.getString(5));
-        alarm.setSave(Integer.parseInt(cursor.getString(6)));
+        alarm.setId(Integer.parseInt(cursor.getString(0)));
+        alarm.setAid(Integer.parseInt(cursor.getString(1)));
+        alarm.setGame(cursor.getString(2));
+        alarm.setFlag(Integer.parseInt(cursor.getString(3)));
+        alarm.setFull(Integer.parseInt(cursor.getString(4)));
+        alarm.setTrigger(Long.parseLong(cursor.getString(5)));
+        alarm.setLabel(cursor.getString(6));
+        alarm.setSave(Integer.parseInt(cursor.getString(7)));
 
         cursor.close();
 
@@ -353,13 +357,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 alarm = new Alarm();
-                alarm.setAid(Integer.parseInt(cursor.getString(0)));
-                alarm.setGame(cursor.getString(1));
-                alarm.setFlag(Integer.parseInt(cursor.getString(2)));
-                alarm.setFull(Integer.parseInt(cursor.getString(3)));
-                alarm.setTrigger(Long.parseLong(cursor.getString(4)));
-                alarm.setLabel(cursor.getString(5));
-                alarm.setSave(Integer.parseInt(cursor.getString(6)));
+                alarm.setId(Integer.parseInt(cursor.getString(0)));
+                alarm.setAid(Integer.parseInt(cursor.getString(1)));
+                alarm.setGame(cursor.getString(2));
+                alarm.setFlag(Integer.parseInt(cursor.getString(3)));
+                alarm.setFull(Integer.parseInt(cursor.getString(4)));
+                alarm.setTrigger(Long.parseLong(cursor.getString(5)));
+                alarm.setLabel(cursor.getString(6));
+                alarm.setSave(Integer.parseInt(cursor.getString(7)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -398,13 +403,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 alarm = new Alarm();
-                alarm.setAid(Integer.parseInt(cursor.getString(0)));
-                alarm.setGame(cursor.getString(1));
-                alarm.setFlag(Integer.parseInt(cursor.getString(2)));
-                alarm.setFull(Integer.parseInt(cursor.getString(3)));
-                alarm.setTrigger(Long.parseLong(cursor.getString(4)));
-                alarm.setLabel(cursor.getString(5));
-                alarm.setSave(Integer.parseInt(cursor.getString(6)));
+                alarm.setId(Integer.parseInt(cursor.getString(0)));
+                alarm.setAid(Integer.parseInt(cursor.getString(1)));
+                alarm.setGame(cursor.getString(2));
+                alarm.setFlag(Integer.parseInt(cursor.getString(3)));
+                alarm.setFull(Integer.parseInt(cursor.getString(4)));
+                alarm.setTrigger(Long.parseLong(cursor.getString(5)));
+                alarm.setLabel(cursor.getString(6));
+                alarm.setSave(Integer.parseInt(cursor.getString(7)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -438,7 +444,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Update the row
         db.update(TABLE_ALARMS,                             // table
                 values,                                     // values
-                KEY_AID + " = ?",                           // selections
+                KEY_ID + " = ?",                           // selections
                 new String[]{String.valueOf(alarmId)});     // selection arguments
 
         // Close the database
@@ -450,7 +456,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Delete the row
-        db.delete(TABLE_ALARMS, KEY_AID + " = ?", new String[]{String.valueOf(alarm.getAid())});
+        db.delete(TABLE_ALARMS, KEY_ID + " = ?", new String[]{String.valueOf(alarm.getId())});
 
         // Close the database
         db.close();

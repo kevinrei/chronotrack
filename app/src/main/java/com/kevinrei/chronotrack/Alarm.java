@@ -1,6 +1,7 @@
 package com.kevinrei.chronotrack;
 
 public class Alarm {
+    private int id;             // ID
     private int aid;            // Alarm ID
     private String game;        // Game the alarm is for
     private int flag;           // Layout flag
@@ -11,8 +12,9 @@ public class Alarm {
 
     public Alarm() {}
 
-    public Alarm(int aid, String game, int flag, int full, long trigger, String label, int save) {
+    public Alarm(int id, int aid, String game, int flag, int full, long trigger, String label, int save) {
         super();
+        this.id = id;
         this.aid = aid;
         this.game = game;
         this.flag = flag;
@@ -26,7 +28,8 @@ public class Alarm {
 
     @Override
     public String toString() {
-        return "Alarm [aid="    + aid       + ", " +
+        return "Alarm [id="     + id        + ", " +
+                "aid="          + aid       + ", " +
                 "game="         + game      + ", " +
                 "flag="         + flag      + ", " +
                 "full="         + full      + ", " +
@@ -35,6 +38,7 @@ public class Alarm {
                 "save="         + save      + "]";
     }
 
+    public int getId() { return id; }
     public int getAid() { return aid; }
     public String getGame() { return game; }
     public int getFlag() { return flag; }
@@ -43,6 +47,7 @@ public class Alarm {
     public String getLabel() { return label; }
     public int getSave() { return save; }
 
+    public void setId(int id) { this.id = id; }
     public void setAid(int aid) { this.aid = aid; }
     public void setGame(String game) { this.game = game; }
     public void setFlag(int flag) { this.flag = flag; }

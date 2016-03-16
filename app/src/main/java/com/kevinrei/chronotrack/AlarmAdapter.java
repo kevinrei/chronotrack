@@ -1,7 +1,11 @@
 package com.kevinrei.chronotrack;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -66,7 +70,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final Alarm alarm = alarms.get(position);
 
-        Log.d("Save", String.valueOf(alarm.getSave()));
+        Log.d("alarm_id", String.valueOf(alarm.getAid()));
 
         // If alarm is saved, enable toggle
         viewHolder.mAlarmToggle.setEnabled(alarm.getSave() == 1);
@@ -114,7 +118,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         long value = 0;
         long time = alarm.getTrigger();
 
-        if (time > DAY) {
+        if (time >= DAY) {
             value = time / DAY;
             if (value == 1) {
                 trigger.append(time / DAY).append(" day ");
@@ -124,7 +128,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             time %= DAY;
         }
 
-        if (time > HOUR) {
+        if (time >= HOUR) {
             value = time / HOUR;
             if (value == 1) {
                 trigger.append(time / HOUR).append(" hour ");
@@ -134,7 +138,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             time %= HOUR;
         }
 
-        if (time > MINUTE) {
+        if (time >= MINUTE) {
             value = time / MINUTE;
             if (value == 1) {
                 trigger.append(time / MINUTE).append(" minute ");
@@ -179,6 +183,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // cancelDeletedAlarm(v.getContext(), alarm.getAid());
+                        AddAlarmActivity.cancelAlarm(alarm.getAid());
                         db.deleteAlarm(alarm);
                         Snackbar.make(v,
                                 "Successfully deleted the alarm.",

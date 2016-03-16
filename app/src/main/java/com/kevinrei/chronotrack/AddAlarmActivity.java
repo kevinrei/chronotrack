@@ -1,6 +1,8 @@
 package com.kevinrei.chronotrack;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,11 +33,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ViewSwitcher;
-
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -102,6 +99,13 @@ public class AddAlarmActivity extends AppCompatActivity {
     int mHour;
     int mMinute;
 
+    /** Alarm variables */
+    public static AlarmManager mAlarmManager;
+    public static PendingIntent mPendingIntent;
+
+    public static Context context;
+    public static Intent notifyIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +122,8 @@ public class AddAlarmActivity extends AppCompatActivity {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_home);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         Intent i = getIntent();
         game = (Game) i.getSerializableExtra("game");
@@ -188,6 +194,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (id == R.id.action_save) {
+            int uniqueAlarmID = (int) (System.currentTimeMillis() / 100000);
             String gameTitle = game.getTitle();
             int staminaFullTime = -1;        // Minutes until stamina is full
             long alarmTriggerTime = -1;      // When the alarm should be triggered
@@ -231,6 +238,7 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             Alarm alarm = new Alarm();
 
+            alarm.setAid(uniqueAlarmID);
             alarm.setGame(gameTitle);
             alarm.setFlag(layoutFlag);
             alarm.setFull(staminaFullTime);
@@ -238,7 +246,19 @@ public class AddAlarmActivity extends AppCompatActivity {
             alarm.setLabel(alarmLabel);
             alarm.setSave(saveAfterFlag);
 
+            // Add the alarm to the database
             db.addAlarm(alarm);
+
+            // Trigger a new PendingIntent
+            context = AddAlarmActivity.this;
+            notifyIntent = new Intent(this, AlarmReceiver.class);
+            mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAid(), notifyIntent, 0);
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP,
+                    System.currentTimeMillis() + alarmTriggerTime,
+                    mPendingIntent);
+
+            Log.d("aid_create", String.valueOf(alarm.getAid()));
+
             Intent i = new Intent();
             i.putExtra("game_title", gameTitle);
             setResult(RESULT_OK, i);
@@ -507,4 +527,11 @@ public class AddAlarmActivity extends AppCompatActivity {
             }
         }
     };
+
+    public static void cancelAlarm(int aid) {
+        if (mAlarmManager != null) {
+            PendingIntent cancelIntent = PendingIntent.getBroadcast(context, aid, notifyIntent, 0);
+            mAlarmManager.cancel(cancelIntent);
+        }
+    }
 }
