@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,11 +27,12 @@ import com.squareup.picasso.Target;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 public class GameDetailActivity extends AppCompatActivity {
 
-    private static final int DATASET_COUNT = 60;
-    protected String[] mDataSet;
+    /** Action code */
+    private static final int ADD_NEW_ALARM = 2;
 
     /** Database and data values*/
     private MySQLiteHelper db;
@@ -53,6 +55,7 @@ public class GameDetailActivity extends AppCompatActivity {
     protected LinearLayoutManager mLayoutManager;
     protected RecyclerView mRecyclerView;
     protected AlarmAdapter mAlarmAdapter;
+    protected List<Alarm> alarms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,14 +122,14 @@ public class GameDetailActivity extends AppCompatActivity {
         // Full recovery time
         mFullRecovery.setText(calculateTime(gameRate * gameMax));
 
-        initDataSet();
+        // Alarm list
+        alarms = db.getAlarmsForGame(gameTitle);
 
         mRecyclerView.setHasFixedSize(true);
-
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAlarmAdapter = new AlarmAdapter(mDataSet);
+        mAlarmAdapter = new AlarmAdapter(alarms);
         mRecyclerView.setAdapter(mAlarmAdapter);
     }
 
@@ -152,7 +155,7 @@ public class GameDetailActivity extends AppCompatActivity {
         else if (id == R.id.action_add_alarm) {
             Intent i = new Intent(this, AddAlarmActivity.class);
             i.putExtra("game", game);
-            startActivity(i);
+            startActivityForResult(i, ADD_NEW_ALARM);
             return true;
         }
 
@@ -165,6 +168,17 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == ADD_NEW_ALARM) {
+                Snackbar.make(mView,
+                        "Successfully added the alarm.",
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -222,12 +236,5 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         return hours + " hours " + minutes + " minutes";
-    }
-
-    private void initDataSet() {
-        mDataSet = new String[DATASET_COUNT];
-        for (int i = 0; i < DATASET_COUNT; i++) {
-            mDataSet[i] = "This is element #" + i;
-        }
     }
 }

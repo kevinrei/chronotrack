@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     /** Action code */
     private static final int SELECT_INSTALLED_APP = 0;
     private static final int ADD_NEW_GAME = 1;
+    private static final int ADD_NEW_ALARM = 2;
 
     /** ViewPager */
     private View view;
@@ -131,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
 
             else if (requestCode == ADD_NEW_GAME) {
                 String confirmAdd = "Successfully added " + data.getStringExtra("game_title") + ".";
+                Snackbar.make(view, confirmAdd, Snackbar.LENGTH_LONG).show();
+            }
+
+            else if (requestCode == ADD_NEW_ALARM) {
+                String confirmAdd = "Added alarm for " + data.getStringExtra("game_title") + ".";
                 Snackbar.make(view, confirmAdd, Snackbar.LENGTH_LONG).show();
             }
         }

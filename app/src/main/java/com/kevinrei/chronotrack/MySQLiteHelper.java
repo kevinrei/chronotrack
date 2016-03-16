@@ -77,6 +77,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         String CREATE_ALARMS_TABLE = "CREATE TABLE " + TABLE_ALARMS + " (" +
                 KEY_AID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                KEY_GAME + " TEXT, " +
                 KEY_FLAG + " INTEGER, " +
                 KEY_FULL + " INTEGER, " +
                 KEY_TRIGGER + " INTEGER, " +
@@ -135,6 +136,44 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 COLUMNS_GAMES,                          // column names
                 " id = ?",                              // selections
                 new String[] { String.valueOf(id) },    // selection arguments
+                null,                                   // group by
+                null,                                   // having
+                null,                                   // order by
+                null);                                  // limit
+
+        // If the results are retrieved, get the first one
+        if (cursor != null) { cursor.moveToFirst(); }
+
+        // Build the Game object
+        Game game = new Game();
+        game.setId(Integer.parseInt(cursor.getString(0)));
+        game.setTitle(cursor.getString(1));
+        game.setImage(cursor.getString(2));
+        game.setCategory(cursor.getString(3));
+        game.setUnit(cursor.getString(4));
+        game.setRecoveryRate(Integer.parseInt(cursor.getString(5)));
+        game.setMaxStamina(Integer.parseInt(cursor.getString(6)));
+
+        cursor.close();
+
+        db.close();
+
+        Log.d(TAG_GAME, game.toString());
+
+        // Return the game
+        return game;
+    }
+
+    // Get the details of a specific game
+    public Game getGame(String title) {
+        // Get reference to a readable database
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Build the query
+        Cursor cursor = db.query(TABLE_GAMES,           // table
+                COLUMNS_GAMES,                          // column names
+                " title = ?",                           // selections
+                new String[] { title },                 // selection arguments
                 null,                                   // group by
                 null,                                   // having
                 null,                                   // order by
@@ -246,7 +285,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_AID, alarm.getAid());
         values.put(KEY_GAME, alarm.getGame());
         values.put(KEY_FLAG, alarm.getFlag());
         values.put(KEY_FULL, alarm.getFull());

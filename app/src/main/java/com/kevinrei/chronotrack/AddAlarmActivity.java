@@ -32,6 +32,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ViewSwitcher;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -193,14 +198,13 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             if (layoutFlag == LAYOUT_STAMINA) {
                 staminaFullTime = mGoalPicker.getValue() - mCurrentPicker.getValue();
+                alarmTriggerTime = game.getRecoveryRate() * staminaFullTime * 1000;
                 saveAfter = mCheckSave.isChecked();
             }
 
             else if (layoutFlag == LAYOUT_CONDITION_DATETIME) {
                 Date conditionGoal = getGoal(goalDate, goalTime);
                 alarmTriggerTime = conditionGoal.getTime() - c.getTimeInMillis();
-
-                Log.d("alarm", String.valueOf(alarmTriggerTime));
 
                 if (alarmTriggerTime < 0) {
                     Snackbar.make(mView, "Invalid time. Please try a different time.",
@@ -235,8 +239,10 @@ public class AddAlarmActivity extends AppCompatActivity {
             alarm.setSave(saveAfterFlag);
 
             db.addAlarm(alarm);
-
-            return true;
+            Intent i = new Intent();
+            i.putExtra("game_title", gameTitle);
+            setResult(RESULT_OK, i);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -385,9 +391,6 @@ public class AddAlarmActivity extends AppCompatActivity {
                         goalReminder = String.format(Locale.getDefault(),
                                 "%02dh %02dm %02ds", hours, minutes, seconds);
 
-                        Log.d("Goal", goalReminder);
-                        Log.d("Reminder", String.valueOf(reminderValue));
-
                         mCurrentReminderText.setText(goalReminder);
                     }
                 }).show();
@@ -481,6 +484,13 @@ public class AddAlarmActivity extends AppCompatActivity {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                     goalTime = hourOfDay + ":" + minute;
+
+                                    if (hourOfDay < 12) {
+                                        goalTime += " AM";
+                                    } else {
+                                        goalTime += " PM";
+                                    }
+
                                     String formatted = formatTime(hourOfDay, minute);
                                     mCurrentTimeText.setText(formatted);
                                 }

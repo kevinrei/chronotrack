@@ -21,28 +21,30 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_gravity="center_vertical"
+            android:clickable="true"
             android:src="@drawable/ic_alarm_on"
             android:contentDescription="@string/lbl_alarm" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/trigger_time"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/label_alarm"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/alarm_label"
+                android:textSize="32sp"
+                android:textColorHint="@color/textIcons"
                 android:singleLine="true"
-                android:text="@string/filler_time"
-                android:textColor="@color/textIcons"
-                android:textSize="32sp"/>
+                android:background="@android:color/transparent"/>
 
             <TextView
-                android:id="@+id/trigger_date"
-                android:text="@string/filler_date"
+                android:id="@+id/alarm_trigger_time"
+                android:text="@string/filler_trigger_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -56,23 +58,21 @@
         android:layout_marginTop="24dp"
         android:orientation="horizontal" >
 
-        <EditText
-            android:id="@+id/label_alarm"
+        <TextView
+            android:id="@+id/category_alarm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/alarm_label"
-            android:textColorHint="@color/textIcons"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@android:color/transparent"/>
+            android:text="@string/stamina_alarm" />
 
         <ImageView
             android:id="@+id/delete_alarm"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_gravity="center_vertical"
+            android:clickable="true"
             android:src="@drawable/ic_delete"
-            android:contentDescription="@string/delete_confirm"/>
+            android:contentDescription="@string/delete_confirm_game"/>
 
     </LinearLayout>
 

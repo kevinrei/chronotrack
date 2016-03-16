@@ -27,6 +27,9 @@ import java.util.List;
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         implements SimpleItemTouchHelperCallback.ItemTouchHelperAdapter {
 
+    /** Action code */
+    private static final int ADD_NEW_ALARM = 2;
+
     public static class Action {
         public final int icon;
         public final String action;
@@ -180,7 +183,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                             Log.d("Option 1", "Create an alarm");
                             Intent i = new Intent(context, AddAlarmActivity.class);
                             i.putExtra("game", game);
-                            context.startActivity(i);
+                            ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
                         }
 
                         else if (which == 1) {
@@ -242,7 +245,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         String deleteTitle = "Deleting " + game.getTitle() + "...";
         final String confirmDelete = "Successfully deleted " + game.getTitle() + ".";
         mBuilder.setTitle(deleteTitle)
-                .setMessage(R.string.delete_confirm)
+                .setMessage(R.string.delete_confirm_game)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

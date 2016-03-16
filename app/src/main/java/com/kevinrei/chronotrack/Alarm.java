@@ -4,7 +4,7 @@ public class Alarm {
     private int aid;            // Alarm ID
     private String game;        // Game the alarm is for
     private int flag;           // Layout flag
-    private int full;           // Stamina difference
+    private int full;           // Stamina difference (-1 if invalid)
     private long trigger;       // Trigger time
     private String label;       // Alarm label
     private int save;           // Save (1) or delete (0)
