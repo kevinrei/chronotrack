@@ -31,10 +31,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     /** Constants for alarms table & column names */
     private static final String TABLE_ALARMS = "alarms";            // Table of alarms
-    private static final String KEY_AID = "aid";                    // Alarm ID of value
-    private static final String KEY_GAME = "game";                  // Game
+    private static final String KEY_ALARM_ID = "alarmId";           // Alarm ID
+    private static final String KEY_GAME_ID = "gameId";             // Game ID of alarm
     private static final String KEY_FLAG = "flag";                  // Layout flag
-    private static final String KEY_FULL = "full";                  // Stamina difference
+    private static final String KEY_START = "start";                // Current stamina
+    private static final String KEY_END = "end";                    // Goal stamina
     private static final String KEY_TRIGGER = "trigger";            // Trigger time
     private static final String KEY_LABEL = "label";                // Alarm label
     private static final String KEY_SAVE = "save";                  // Save or delete
@@ -51,10 +52,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String[] COLUMNS_ALARMS = {
             KEY_ID,
-            KEY_AID,
-            KEY_GAME,
+            KEY_ALARM_ID,
+            KEY_GAME_ID,
             KEY_FLAG,
-            KEY_FULL,
+            KEY_START,
+            KEY_END,
             KEY_TRIGGER,
             KEY_LABEL,
             KEY_SAVE
@@ -78,10 +80,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         String CREATE_ALARMS_TABLE = "CREATE TABLE " + TABLE_ALARMS + " (" +
                 KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                KEY_AID + " INTEGER, " +
-                KEY_GAME + " TEXT, " +
+                KEY_ALARM_ID + " INTEGER, " +
+                KEY_GAME_ID + " INTEGER, " +
                 KEY_FLAG + " INTEGER, " +
-                KEY_FULL + " INTEGER, " +
+                KEY_START + " INTEGER, " +
+                KEY_END + " INTEGER, " +
                 KEY_TRIGGER + " INTEGER, " +
                 KEY_LABEL + " TEXT, " +
                 KEY_SAVE + " INTEGER ); ";
@@ -138,44 +141,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 COLUMNS_GAMES,                          // column names
                 " id = ?",                              // selections
                 new String[] { String.valueOf(id) },    // selection arguments
-                null,                                   // group by
-                null,                                   // having
-                null,                                   // order by
-                null);                                  // limit
-
-        // If the results are retrieved, get the first one
-        if (cursor != null) { cursor.moveToFirst(); }
-
-        // Build the Game object
-        Game game = new Game();
-        game.setId(Integer.parseInt(cursor.getString(0)));
-        game.setTitle(cursor.getString(1));
-        game.setImage(cursor.getString(2));
-        game.setCategory(cursor.getString(3));
-        game.setUnit(cursor.getString(4));
-        game.setRecoveryRate(Integer.parseInt(cursor.getString(5)));
-        game.setMaxStamina(Integer.parseInt(cursor.getString(6)));
-
-        cursor.close();
-
-        db.close();
-
-        Log.d(TAG_GAME, game.toString());
-
-        // Return the game
-        return game;
-    }
-
-    // Get the details of a specific game
-    public Game getGame(String title) {
-        // Get reference to a readable database
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Build the query
-        Cursor cursor = db.query(TABLE_GAMES,           // table
-                COLUMNS_GAMES,                          // column names
-                " title = ?",                           // selections
-                new String[] { title },                 // selection arguments
                 null,                                   // group by
                 null,                                   // having
                 null,                                   // order by
@@ -287,10 +252,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_AID, alarm.getAid());
-        values.put(KEY_GAME, alarm.getGame());
+        values.put(KEY_ALARM_ID, alarm.getAlarmId());
+        values.put(KEY_GAME_ID, alarm.getGameId());
         values.put(KEY_FLAG, alarm.getFlag());
-        values.put(KEY_FULL, alarm.getFull());
+        values.put(KEY_START, alarm.getStart());
+        values.put(KEY_END, alarm.getEnd());
         values.put(KEY_TRIGGER, alarm.getTrigger());
         values.put(KEY_LABEL, alarm.getLabel());
         values.put(KEY_SAVE, alarm.getSave());
@@ -325,13 +291,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Build the Alarm object
         Alarm alarm = new Alarm();
         alarm.setId(Integer.parseInt(cursor.getString(0)));
-        alarm.setAid(Integer.parseInt(cursor.getString(1)));
-        alarm.setGame(cursor.getString(2));
+        alarm.setAlarmId(Integer.parseInt(cursor.getString(1)));
+        alarm.setGameId(Integer.parseInt(cursor.getString(2)));
         alarm.setFlag(Integer.parseInt(cursor.getString(3)));
-        alarm.setFull(Integer.parseInt(cursor.getString(4)));
-        alarm.setTrigger(Long.parseLong(cursor.getString(5)));
-        alarm.setLabel(cursor.getString(6));
-        alarm.setSave(Integer.parseInt(cursor.getString(7)));
+        alarm.setStart(Integer.parseInt(cursor.getString(4)));
+        alarm.setEnd(Integer.parseInt(cursor.getString(5)));
+        alarm.setTrigger(Long.parseLong(cursor.getString(6)));
+        alarm.setLabel(cursor.getString(7));
+        alarm.setSave(Integer.parseInt(cursor.getString(8)));
 
         cursor.close();
 
@@ -358,13 +325,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             do {
                 alarm = new Alarm();
                 alarm.setId(Integer.parseInt(cursor.getString(0)));
-                alarm.setAid(Integer.parseInt(cursor.getString(1)));
-                alarm.setGame(cursor.getString(2));
+                alarm.setAlarmId(Integer.parseInt(cursor.getString(1)));
+                alarm.setGameId(Integer.parseInt(cursor.getString(2)));
                 alarm.setFlag(Integer.parseInt(cursor.getString(3)));
-                alarm.setFull(Integer.parseInt(cursor.getString(4)));
-                alarm.setTrigger(Long.parseLong(cursor.getString(5)));
-                alarm.setLabel(cursor.getString(6));
-                alarm.setSave(Integer.parseInt(cursor.getString(7)));
+                alarm.setStart(Integer.parseInt(cursor.getString(4)));
+                alarm.setEnd(Integer.parseInt(cursor.getString(5)));
+                alarm.setTrigger(Long.parseLong(cursor.getString(6)));
+                alarm.setLabel(cursor.getString(7));
+                alarm.setSave(Integer.parseInt(cursor.getString(8)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -381,21 +349,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Get the list of all alarms
-    public List<Alarm> getAlarmsForGame(String game) {
+    public List<Alarm> getAlarmsForGame(int gameId) {
         List<Alarm> alarmList = new LinkedList<>();
 
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Build the query
-        Cursor cursor = db.query(TABLE_ALARMS,          // table
-                COLUMNS_ALARMS,                         // column names
-                " game = ?",                            // selections
-                new String[] { String.valueOf(game) },  // selection arguments
-                null,                                   // group by
-                null,                                   // having
-                null,                                   // order by
-                null);                                  // limit
+        Cursor cursor = db.query(TABLE_ALARMS,              // table
+                COLUMNS_ALARMS,                             // column names
+                " gameId = ?",                              // selections
+                new String[] { String.valueOf(gameId) },    // selection arguments
+                null,                                       // group by
+                null,                                       // having
+                null,                                       // order by
+                null);                                      // limit
 
         // Go over each row, build the row and add it to the list
         Alarm alarm;
@@ -404,13 +372,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             do {
                 alarm = new Alarm();
                 alarm.setId(Integer.parseInt(cursor.getString(0)));
-                alarm.setAid(Integer.parseInt(cursor.getString(1)));
-                alarm.setGame(cursor.getString(2));
+                alarm.setAlarmId(Integer.parseInt(cursor.getString(1)));
+                alarm.setGameId(Integer.parseInt(cursor.getString(2)));
                 alarm.setFlag(Integer.parseInt(cursor.getString(3)));
-                alarm.setFull(Integer.parseInt(cursor.getString(4)));
-                alarm.setTrigger(Long.parseLong(cursor.getString(5)));
-                alarm.setLabel(cursor.getString(6));
-                alarm.setSave(Integer.parseInt(cursor.getString(7)));
+                alarm.setStart(Integer.parseInt(cursor.getString(4)));
+                alarm.setEnd(Integer.parseInt(cursor.getString(5)));
+                alarm.setTrigger(Long.parseLong(cursor.getString(6)));
+                alarm.setLabel(cursor.getString(7));
+                alarm.setSave(Integer.parseInt(cursor.getString(8)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -433,10 +402,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_AID, alarm.getAid());
-        values.put(KEY_GAME, alarm.getGame());
+        values.put(KEY_ALARM_ID, alarm.getAlarmId());
+        values.put(KEY_GAME_ID, alarm.getGameId());
         values.put(KEY_FLAG, alarm.getFlag());
-        values.put(KEY_FULL, alarm.getFull());
+        values.put(KEY_START, alarm.getStart());
+        values.put(KEY_END, alarm.getEnd());
         values.put(KEY_TRIGGER, alarm.getTrigger());
         values.put(KEY_LABEL, alarm.getLabel());
         values.put(KEY_SAVE, alarm.getSave());

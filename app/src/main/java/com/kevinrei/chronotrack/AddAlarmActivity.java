@@ -195,8 +195,9 @@ public class AddAlarmActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_save) {
             int uniqueAlarmID = (int) (System.currentTimeMillis() / 100000);
-            String gameTitle = game.getTitle();
-            int staminaFullTime = -1;        // Minutes until stamina is full
+            int gameId = game.getId();
+            int current = 0;
+            int goal = 0;
             long alarmTriggerTime = -1;      // When the alarm should be triggered
             String alarmLabel;               // The alarm's label
             boolean saveAfter = false;      // Delete the alarm after it's been triggered
@@ -204,8 +205,10 @@ public class AddAlarmActivity extends AppCompatActivity {
             Log.d("layout", String.valueOf(layoutFlag));
 
             if (layoutFlag == LAYOUT_STAMINA) {
-                staminaFullTime = mGoalPicker.getValue() - mCurrentPicker.getValue();
-                alarmTriggerTime = game.getRecoveryRate() * staminaFullTime * 1000;
+                current = mCurrentPicker.getValue();
+                goal = mGoalPicker.getValue();
+
+                alarmTriggerTime = game.getRecoveryRate() * (goal - current) * 1000;
                 saveAfter = mCheckSave.isChecked();
             }
 
@@ -236,12 +239,14 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             int saveAfterFlag = (saveAfter) ? 1 : 0;
 
+            // Create the new Alarm
             Alarm alarm = new Alarm();
 
-            alarm.setAid(uniqueAlarmID);
-            alarm.setGame(gameTitle);
+            alarm.setAlarmId(uniqueAlarmID);
+            alarm.setGameId(gameId);
             alarm.setFlag(layoutFlag);
-            alarm.setFull(staminaFullTime);
+            alarm.setStart(current);
+            alarm.setEnd(goal);
             alarm.setTrigger(alarmTriggerTime);
             alarm.setLabel(alarmLabel);
             alarm.setSave(saveAfterFlag);
@@ -252,15 +257,14 @@ public class AddAlarmActivity extends AppCompatActivity {
             // Trigger a new PendingIntent
             context = AddAlarmActivity.this;
             notifyIntent = new Intent(this, AlarmReceiver.class);
-            mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAid(), notifyIntent, 0);
+            mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAlarmId(), notifyIntent, 0);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP,
                     System.currentTimeMillis() + alarmTriggerTime,
                     mPendingIntent);
 
-            Log.d("aid_create", String.valueOf(alarm.getAid()));
-
+            // Pass the result to MainActivity
             Intent i = new Intent();
-            i.putExtra("game_title", gameTitle);
+            i.putExtra("game_title", game.getTitle());
             setResult(RESULT_OK, i);
             finish();
         }

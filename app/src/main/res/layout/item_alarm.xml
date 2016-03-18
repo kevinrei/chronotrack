@@ -12,15 +12,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal" >
 
         <ImageView
             android:id="@+id/alarm_toggle"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_marginLeft="@dimen/margin_small"
+            android:layout_marginStart="@dimen/margin_small"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_gravity="center_vertical"
             android:clickable="true"
             android:src="@drawable/ic_alarm_on"
             android:contentDescription="@string/lbl_alarm" />
@@ -28,8 +30,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:orientation="vertical" >
 
             <EditText
@@ -55,21 +55,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal" >
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:orientation="horizontal"
+        android:weightSum="3" >
 
         <TextView
-            android:id="@+id/category_alarm"
+            android:id="@+id/time_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/filler_trigger_left" />
+
+        <TextView
+            android:id="@+id/stamina_progress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/stamina_alarm" />
+            android:text="@string/filler_stamina_progress" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            style="@android:style/Widget.ProgressBar.Horizontal" />
+
 
         <ImageView
             android:id="@+id/delete_alarm"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="center_vertical"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:clickable="true"
             android:src="@drawable/ic_delete"
             android:contentDescription="@string/delete_confirm_game"/>

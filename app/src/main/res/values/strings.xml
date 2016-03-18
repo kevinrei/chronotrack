@@ -67,9 +67,8 @@
     <!-- Alarm List Item -->
     <string name="lbl_alarm">Label</string>
     <string name="filler_trigger_time">0 days 0 hours 0 minutes</string>
-    <string name="stamina_alarm">Stamina</string>
-    <string name="condition_datetime_alarm">Condition - Date &amp; Time</string>
-    <string name="condition_countdown_alarm">Condition - Countdown</string>
+    <string name="filler_trigger_left">0 days 0 hours 0 minutes left</string>
+    <string name="filler_stamina_progress">Stamina: 0/999</string>
 
     <string name="alarms_list">This is a list of alarms.</string>
     <string name="timer_text">This is a timer.</string>

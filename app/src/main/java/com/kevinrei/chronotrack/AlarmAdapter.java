@@ -1,12 +1,9 @@
 package com.kevinrei.chronotrack;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
+import android.os.CountDownTimer;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
 
@@ -32,12 +31,16 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     private MySQLiteHelper db;
     private List<Alarm> alarms;
 
+    private CountDownTimer mCountdown;
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView mAlarmToggle;
         private final EditText mAlarmLabel;
-        private final TextView mAlarmTrigger;
-        private final TextView mAlarmCategory;
+        private final TextView mTriggerTime;
+        private final TextView mTimeLeft;
+        private final TextView mStaminaProgress;
+        private final ProgressBar mProgressBar;
         private final ImageView mAlarmDelete;
 
         public ViewHolder(View v) {
@@ -45,8 +48,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
             mAlarmToggle = (ImageView) v.findViewById(R.id.alarm_toggle);
             mAlarmLabel = (EditText) v.findViewById(R.id.label_alarm);
-            mAlarmTrigger = (TextView) v.findViewById(R.id.alarm_trigger_time);
-            mAlarmCategory = (TextView) v.findViewById(R.id.category_alarm);
+            mTriggerTime = (TextView) v.findViewById(R.id.alarm_trigger_time);
+            mTimeLeft = (TextView) v.findViewById(R.id.time_left);
+            mStaminaProgress = (TextView) v.findViewById(R.id.stamina_progress);
+            mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
             mAlarmDelete = (ImageView) v.findViewById(R.id.delete_alarm);
         }
     }
@@ -69,19 +74,48 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final Alarm alarm = alarms.get(position);
+        int flag = alarm.getFlag();
+        int start = alarm.getStart();
+        int end = alarm.getEnd();
 
-        Log.d("alarm_id", String.valueOf(alarm.getAid()));
+        db = new MySQLiteHelper(viewHolder.itemView.getContext());
+        Game game = db.getGame(alarm.getGameId());
 
         // If alarm is saved, enable toggle
         viewHolder.mAlarmToggle.setEnabled(alarm.getSave() == 1);
 
+        // Alarm label
         viewHolder.mAlarmLabel.setText(alarm.getLabel());
 
-        String triggerTime = getAlarmTriggerTime(alarm);
-        viewHolder.mAlarmTrigger.setText(triggerTime);
+        // The exact trigger time
+        String triggerTime = getAlarmTriggerTime(alarm.getTrigger());
+        viewHolder.mTriggerTime.setText(triggerTime);
 
-        String category = getAlarmCategory(viewHolder, alarm.getFlag());
-        viewHolder.mAlarmCategory.setText(category);
+        // Time remaining until alarm is fired
+        mCountdown = new CountDownTimer(alarm.getTrigger(), game.getRecoveryRate()) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                viewHolder.mTimeLeft.setText(getAlarmTriggerTime(millisUntilFinished));
+            }
+
+            @Override
+            public void onFinish() {
+                String complete = "Alarm triggered!";
+                viewHolder.mTimeLeft.setText(complete);
+            }
+        };
+        mCountdown.start();
+
+        // Stamina progress, only displayed if flag == 1
+        if (flag == 1) {
+            viewHolder.mStaminaProgress.setVisibility(View.VISIBLE);
+            String stamina = start + "/" + end;
+            viewHolder.mStaminaProgress.setText(stamina);
+        } else {
+            viewHolder.mStaminaProgress.setVisibility(View.GONE);
+        }
+
+        // Progress bar
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,12 +145,13 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         return alarms.size();
     }
 
+
     /** Custom methods */
 
-    private String getAlarmTriggerTime(Alarm alarm) {
+    private String getAlarmTriggerTime(long triggerTime) {
         StringBuilder trigger = new StringBuilder("");
-        long value = 0;
-        long time = alarm.getTrigger();
+        long value;
+        long time = triggerTime;
 
         if (time >= DAY) {
             value = time / DAY;
@@ -147,22 +182,21 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             }
         }
 
+        // Only show seconds when less than a minute
+        else if (time >= SECOND) {
+            value = time / SECOND;
+            if (value == 1) {
+                trigger.append(time / SECOND).append( "second" );
+            } else {
+                trigger.append(time / SECOND).append(" seconds ");
+            }
+        }
+
         return trigger.toString();
     }
 
-    private String getAlarmCategory(ViewHolder viewHolder, int flag) {
-        String category = "";
-        Resources item = viewHolder.itemView.getResources();
+    private void setProgressBar(ProgressBar bar) {
 
-        if (flag == 1) {
-            category = item.getString(R.string.stamina_alarm);
-        } else if (flag == 2) {
-            category = item.getString(R.string.condition_datetime_alarm);
-        } else if (flag == 3) {
-            category = item.getString(R.string.condition_countdown_alarm);
-        }
-
-        return category;
     }
 
     /** Alert Dialogs */
@@ -183,8 +217,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // cancelDeletedAlarm(v.getContext(), alarm.getAid());
-                        AddAlarmActivity.cancelAlarm(alarm.getAid());
+                        // cancelDeletedAlarm(v.getContext(), alarm.getAlarmId());
+                        AddAlarmActivity.cancelAlarm(alarm.getAlarmId());
                         db.deleteAlarm(alarm);
                         Snackbar.make(v,
                                 "Successfully deleted the alarm.",

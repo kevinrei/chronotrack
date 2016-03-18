@@ -123,7 +123,7 @@ public class GameDetailActivity extends AppCompatActivity {
         mFullRecovery.setText(calculateTime(gameRate * gameMax));
 
         // Alarm list
-        alarms = db.getAlarmsForGame(gameTitle);
+        alarms = db.getAlarmsForGame(gameId);
 
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
