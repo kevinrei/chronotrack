@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +19,11 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
 
@@ -31,8 +36,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     private MySQLiteHelper db;
     private List<Alarm> alarms;
 
-    private CountDownTimer mCountdown;
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView mAlarmToggle;
@@ -42,6 +45,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         private final TextView mStaminaProgress;
         private final ProgressBar mProgressBar;
         private final ImageView mAlarmDelete;
+
+        private final Countdown countdown;
 
         public ViewHolder(View v) {
             super(v);
@@ -53,6 +58,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             mStaminaProgress = (TextView) v.findViewById(R.id.stamina_progress);
             mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
             mAlarmDelete = (ImageView) v.findViewById(R.id.delete_alarm);
+
+            countdown = new Countdown(mTimeLeft);
         }
     }
 
@@ -88,23 +95,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         viewHolder.mAlarmLabel.setText(alarm.getLabel());
 
         // The exact trigger time
-        String triggerTime = getAlarmTriggerTime(alarm.getTrigger());
+        String triggerTime = getAlarmTriggerTime(alarm.getTrigger()).trim();
         viewHolder.mTriggerTime.setText(triggerTime);
 
-        // Time remaining until alarm is fired
-        mCountdown = new CountDownTimer(alarm.getTrigger(), game.getRecoveryRate()) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                viewHolder.mTimeLeft.setText(getAlarmTriggerTime(millisUntilFinished));
-            }
-
-            @Override
-            public void onFinish() {
-                String complete = "Alarm triggered!";
-                viewHolder.mTimeLeft.setText(complete);
-            }
-        };
-        mCountdown.start();
+        viewHolder.countdown.updateTextView(alarm);
 
         // Stamina progress, only displayed if flag == 1
         if (flag == 1) {
@@ -148,10 +142,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     /** Custom methods */
 
-    private String getAlarmTriggerTime(long triggerTime) {
+    private String getAlarmTriggerTime(long time) {
         StringBuilder trigger = new StringBuilder("");
         long value;
-        long time = triggerTime;
 
         if (time >= DAY) {
             value = time / DAY;

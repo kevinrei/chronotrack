@@ -37,6 +37,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_START = "start";                // Current stamina
     private static final String KEY_END = "end";                    // Goal stamina
     private static final String KEY_TRIGGER = "trigger";            // Trigger time
+    private static final String KEY_COUNTDOWN = "countdown";        // Countdown start time
     private static final String KEY_LABEL = "label";                // Alarm label
     private static final String KEY_SAVE = "save";                  // Save or delete
 
@@ -58,6 +59,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             KEY_START,
             KEY_END,
             KEY_TRIGGER,
+            KEY_COUNTDOWN,
             KEY_LABEL,
             KEY_SAVE
     };
@@ -86,6 +88,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 KEY_START + " INTEGER, " +
                 KEY_END + " INTEGER, " +
                 KEY_TRIGGER + " INTEGER, " +
+                KEY_COUNTDOWN + " INTEGER, " +
                 KEY_LABEL + " TEXT, " +
                 KEY_SAVE + " INTEGER ); ";
 
@@ -258,6 +261,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_START, alarm.getStart());
         values.put(KEY_END, alarm.getEnd());
         values.put(KEY_TRIGGER, alarm.getTrigger());
+        values.put(KEY_COUNTDOWN, alarm.getCountdown());
         values.put(KEY_LABEL, alarm.getLabel());
         values.put(KEY_SAVE, alarm.getSave());
 
@@ -297,8 +301,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         alarm.setStart(Integer.parseInt(cursor.getString(4)));
         alarm.setEnd(Integer.parseInt(cursor.getString(5)));
         alarm.setTrigger(Long.parseLong(cursor.getString(6)));
-        alarm.setLabel(cursor.getString(7));
-        alarm.setSave(Integer.parseInt(cursor.getString(8)));
+        alarm.setCountdown(Long.parseLong(cursor.getString(7)));
+        alarm.setLabel(cursor.getString(8));
+        alarm.setSave(Integer.parseInt(cursor.getString(9)));
 
         cursor.close();
 
@@ -331,8 +336,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 alarm.setStart(Integer.parseInt(cursor.getString(4)));
                 alarm.setEnd(Integer.parseInt(cursor.getString(5)));
                 alarm.setTrigger(Long.parseLong(cursor.getString(6)));
-                alarm.setLabel(cursor.getString(7));
-                alarm.setSave(Integer.parseInt(cursor.getString(8)));
+                alarm.setCountdown(Long.parseLong(cursor.getString(7)));
+                alarm.setLabel(cursor.getString(8));
+                alarm.setSave(Integer.parseInt(cursor.getString(9)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -378,8 +384,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 alarm.setStart(Integer.parseInt(cursor.getString(4)));
                 alarm.setEnd(Integer.parseInt(cursor.getString(5)));
                 alarm.setTrigger(Long.parseLong(cursor.getString(6)));
-                alarm.setLabel(cursor.getString(7));
-                alarm.setSave(Integer.parseInt(cursor.getString(8)));
+                alarm.setCountdown(Long.parseLong(cursor.getString(7)));
+                alarm.setLabel(cursor.getString(8));
+                alarm.setSave(Integer.parseInt(cursor.getString(9)));
 
                 // Add each alarm to alarmList
                 alarmList.add(alarm);
@@ -408,6 +415,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_START, alarm.getStart());
         values.put(KEY_END, alarm.getEnd());
         values.put(KEY_TRIGGER, alarm.getTrigger());
+        values.put(KEY_COUNTDOWN, alarm.getCountdown());
         values.put(KEY_LABEL, alarm.getLabel());
         values.put(KEY_SAVE, alarm.getSave());
 

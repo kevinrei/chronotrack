@@ -237,6 +237,7 @@ public class AddAlarmActivity extends AppCompatActivity {
                 alarmLabel = mAlarmLabel.getText().toString();
             }
 
+            long startCountdownValue = System.currentTimeMillis() + alarmTriggerTime;
             int saveAfterFlag = (saveAfter) ? 1 : 0;
 
             // Create the new Alarm
@@ -248,6 +249,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             alarm.setStart(current);
             alarm.setEnd(goal);
             alarm.setTrigger(alarmTriggerTime);
+            alarm.setCountdown(startCountdownValue);
             alarm.setLabel(alarmLabel);
             alarm.setSave(saveAfterFlag);
 
@@ -259,7 +261,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             notifyIntent = new Intent(this, AlarmReceiver.class);
             mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAlarmId(), notifyIntent, 0);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis() + alarmTriggerTime,
+                    startCountdownValue,
                     mPendingIntent);
 
             // Pass the result to MainActivity
