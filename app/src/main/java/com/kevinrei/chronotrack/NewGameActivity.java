@@ -329,12 +329,12 @@ public class NewGameActivity extends AppCompatActivity {
             int appRecovery = game.getRecoveryRate();
             int appMax = game.getMaxStamina();
 
-            mUnit.setText(appUnit);
+            mUnit.setHint(appUnit);
             mRecovery.setSelection(getArrayPosition(appRecovery));
-            mStamina.setText(String.valueOf(appMax));
+            mStamina.setHint(String.valueOf(appMax));
         }
 
-        mTitle.setText(appTitle);
+        mTitle.setHint(appTitle);
 
         imgContent = appIcon;
         Picasso.with(getApplicationContext()).load(imgContent).into(mImage);

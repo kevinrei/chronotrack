@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/colorPrimary"
     tools:context="com.kevinrei.chronotrack.NewGameActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -42,7 +41,8 @@
             android:id="@+id/layout_game"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin">
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="24dp" >
 
             <ImageView
                 android:id="@+id/img_game"
@@ -54,10 +54,19 @@
                 android:src="@mipmap/ic_launcher"
                 android:contentDescription="@string/game_title"/>
 
+            <TextView
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginStart="@dimen/margin_medium"
+                android:layout_below="@+id/img_game"
+                android:gravity="center_horizontal"
+                android:text="@string/btn_change"/>
+
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true" >
+                android:paddingTop="@dimen/margin_small" >
 
                 <TextView
                     android:id="@+id/lbl_category"

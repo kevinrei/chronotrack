@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -80,7 +78,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_game, viewGroup, false);
+                .inflate(R.layout.card_game, viewGroup, false);
 
         return new ViewHolder(v);
     }

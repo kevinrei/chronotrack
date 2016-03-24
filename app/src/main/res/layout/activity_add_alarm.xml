@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/colorPrimary"
     tools:context="com.kevinrei.chronotrack.AddAlarmActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -49,6 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="@string/switch_stamina"
+                android:textColor="@color/textPrimary"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Switch
@@ -71,7 +71,7 @@
                 android:layout_toEndOf="@+id/switch_layout"
                 android:layout_centerVertical="true"
                 android:text="@string/switch_condition"
-                android:textColor="@color/textAndIcons"
+                android:textColor="@color/textPrimary"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </RelativeLayout>
@@ -97,9 +97,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/calculate_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
-                    android:textColor="@color/textAndIcons"/>
+                    android:textColor="@color/textPrimary"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -178,9 +178,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/condition_text"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="italic"
-                    android:textColor="@color/textAndIcons" />
+                    android:textColor="@color/textPrimary"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <RadioGroup
                     android:id="@+id/radioGroup"
@@ -283,7 +283,7 @@
                         android:layout_marginLeft="@dimen/margin_small"
                         android:layout_marginStart="@dimen/margin_small"
                         android:text="@string/default_reminder"
-                        android:textColor="@color/textAndIcons"
+                        android:textColor="@color/textPrimary"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 </LinearLayout>

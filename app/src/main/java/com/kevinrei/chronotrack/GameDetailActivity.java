@@ -1,10 +1,6 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
@@ -15,18 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
 
 public class GameDetailActivity extends AppCompatActivity {
@@ -46,15 +33,16 @@ public class GameDetailActivity extends AppCompatActivity {
 
     /** Widgets and Fields */
     protected View mView;
-    protected RelativeLayout mDetailLayout;
+/*    protected RelativeLayout mDetailLayout;
     protected TextView mLabelMax;
     protected TextView mMaxValue;
     protected TextView mRecoveryRate;
-    protected TextView mFullRecovery;
+    protected TextView mFullRecovery;*/
+    protected TextView mSavedLabel;
 
     protected LinearLayoutManager mLayoutManager;
     protected RecyclerView mRecyclerView;
-    protected AlarmAdapter mAlarmAdapter;
+    protected SavedAlarmAdapter mSavedAlarmAdapter;
     protected List<Alarm> alarms;
 
     @Override
@@ -87,14 +75,15 @@ public class GameDetailActivity extends AppCompatActivity {
 
         // Initialize the views
         mView = findViewById(R.id.main_content);
-        mDetailLayout = (RelativeLayout) findViewById(R.id.layout_mobile_details);
+/*        mDetailLayout = (RelativeLayout) findViewById(R.id.layout_mobile_details);
         mLabelMax = (TextView) findViewById(R.id.lbl_max);
         mMaxValue = (TextView) findViewById(R.id.tv_max);
         mRecoveryRate = (TextView) findViewById(R.id.tv_rcv_rate);
-        mFullRecovery = (TextView) findViewById(R.id.tv_full_rcv);
+        mFullRecovery = (TextView) findViewById(R.id.tv_full_rcv);*/
+        mSavedLabel = (TextView) findViewById(R.id.tv_saved_alarms);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_alarms);
 
-        // Hide the mobile detail layout if the game is not a mobile game
+/*        // Hide the mobile detail layout if the game is not a mobile game
         if (!game.getCategory().equals("Mobile game")) {
             mDetailLayout.setVisibility(View.GONE);
         } else {
@@ -120,17 +109,20 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         // Full recovery time
-        mFullRecovery.setText(calculateTime(gameRate * gameMax));
+        mFullRecovery.setText(calculateTime(gameRate * gameMax));*/
 
         // Alarm list
         alarms = db.getAlarmsForGame(gameId);
+
+        String saved = "Saved Alarms for " + gameTitle;
+        mSavedLabel.setText(saved);
 
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAlarmAdapter = new AlarmAdapter(alarms);
-        mRecyclerView.setAdapter(mAlarmAdapter);
+        mSavedAlarmAdapter = new SavedAlarmAdapter(alarms);
+        mRecyclerView.setAdapter(mSavedAlarmAdapter);
     }
 
     @Override

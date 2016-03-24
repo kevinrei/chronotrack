@@ -2,9 +2,6 @@ package com.kevinrei.chronotrack;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -17,15 +14,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
+public class SavedAlarmAdapter extends RecyclerView.Adapter<SavedAlarmAdapter.ViewHolder> {
 
     /** Day & Time */
     private static final int SECOND = 1000;
@@ -63,7 +54,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         }
     }
 
-    public AlarmAdapter(List<Alarm> alarms) {
+    public SavedAlarmAdapter(List<Alarm> alarms) {
         this.alarms = alarms;
     }
 
@@ -72,7 +63,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_alarm, viewGroup, false);
+                .inflate(R.layout.card_saved_alarm, viewGroup, false);
 
         return new ViewHolder(v);
     }
