@@ -3,23 +3,22 @@ package com.kevinrei.chronotrack;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,20 +28,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
     /** Action code */
     private static final int ADD_NEW_ALARM = 2;
-
-    public static class Action {
-        public final int icon;
-        public final String action;
-        public Action(Integer icon, String action) {
-            this.icon = icon;
-            this.action = action;
-        }
-
-        @Override
-        public String toString() {
-            return action;
-        }
-    }
 
     public interface OnStartDragListener {
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
@@ -54,29 +39,34 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
     public static class ViewHolder extends RecyclerView.ViewHolder
             implements SimpleItemTouchHelperCallback.ItemTouchHelperViewHolder {
 
+        private final RelativeLayout mGameDetail;
         private final ImageView mGameImage;
         private final TextView mGameTitle;
         private final TextView mGameCategory;
-        private final ImageView mReorderHandle;
+        private final TextView mGameCreate;
+        private final TextView mGameEdit;
+        private final TextView mGameDelete;
 
         public ViewHolder(View v) {
             super(v);
 
+            mGameDetail = (RelativeLayout) v.findViewById(R.id.card_detail);
             mGameImage = (ImageView) v.findViewById(R.id.game_img);
-            mGameTitle = (TextView) v.findViewById(R.id.game_title);
-            mGameCategory = (TextView) v.findViewById(R.id.game_category);
-            mReorderHandle = (ImageView) v.findViewById(R.id.reorder_handle);
+            mGameTitle = (TextView) v.findViewById(R.id.card_title);
+            mGameCategory = (TextView) v.findViewById(R.id.card_category);
+            mGameCreate  = (TextView) v.findViewById(R.id.card_create);
+            mGameEdit = (TextView) v.findViewById(R.id.card_edit);
+            mGameDelete = (TextView) v.findViewById(R.id.card_delete);
         }
 
         @Override
         public void onItemSelected() {
             // itemView.setBackgroundResource(R.color.colorPrimaryDark);
-            itemView.setBackgroundColor(0);
         }
 
         @Override
         public void onItemClear() {
-            itemView.setBackgroundColor(0);
+            // itemView.setBackgroundColor(0);
         }
     }
 
@@ -106,17 +96,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         viewHolder.mGameTitle.setText(game.getTitle());
         viewHolder.mGameCategory.setText(game.getCategory());
 
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = v.getContext();
-                Intent i = new Intent(context, GameDetailActivity.class);
-                i.putExtra("game_id", game.getId());
-                context.startActivity(i);
-            }
-        });
+        // Set listeners to card items
+        viewHolder.mGameDetail.setOnClickListener(new CardClickListener(game));
+        viewHolder.mGameCreate.setOnClickListener(new CardClickListener(game));
+        viewHolder.mGameEdit.setOnClickListener(new CardClickListener(game));
+        viewHolder.mGameDelete.setOnClickListener(new CardClickListener(game));
 
-        viewHolder.mReorderHandle.setOnTouchListener(new View.OnTouchListener() {
+        viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.setSelected(false);
@@ -125,84 +111,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 }
 
                 return false;
-            }
-        });
-
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                final View view = v;
-
-                final Action[] actions = {
-                        new Action(R.drawable.ic_add_alarm, "Create Alarm"),
-                        new Action(R.drawable.ic_mode_edit, "Edit"),
-                        new Action(R.drawable.ic_delete, "Delete")
-                };
-
-                TypedArray typedArray = v.getContext().obtainStyledAttributes(null,
-                        R.styleable.AlertDialog, R.attr.alertDialogStyle, 0);
-
-                ListAdapter adapter = new ArrayAdapter<Action>(v.getContext(),
-                        typedArray.getResourceId(R.styleable.AlertDialog_listItemLayout, 0),
-                        android.R.id.text1, actions){
-                    public View getView(int position, View convertView, ViewGroup parent) {
-                        //Use super class to create the View
-                        View v = super.getView(position, convertView, parent);
-                        TextView tv = (TextView) v.findViewById(android.R.id.text1);
-
-                        //Put the image on the TextView
-                        tv.setCompoundDrawablesWithIntrinsicBounds(actions[position].icon, 0, 0, 0);
-
-                        //Add margin between image and text (support various screen densities)
-                        int dp8 = (int) (8 * v.getContext().getResources().getDisplayMetrics().density);
-                        tv.setCompoundDrawablePadding(dp8);
-
-                        return v;
-                    }
-                };
-
-                typedArray.recycle();
-
-                final Context context = v.getContext();
-
-                AlertDialog.Builder mBuilder = new AlertDialog.Builder(v.getContext());
-                mBuilder.setTitle(game.getTitle());
-                mBuilder.setCancelable(false);
-
-                mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                mBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            Log.d("Option 1", "Create an alarm");
-                            Intent i = new Intent(context, AddAlarmActivity.class);
-                            i.putExtra("game", game);
-                            ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
-                        }
-
-                        else if (which == 1) {
-                            Log.d("Option 2", "Edit entry");
-                            Intent i = new Intent(context, NewGameActivity.class);
-                            i.putExtra("flag", 2);
-                            i.putExtra("game", game);
-                            context.startActivity(i);
-                        }
-
-                        else {
-                            Log.d("Option 3", "Delete the game");
-                            showDeleteDialog(view, game);
-                        }
-                    }
-                });
-
-                mBuilder.show();
-                return true;
             }
         });
     }
@@ -261,5 +169,49 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 })
                 .create()
                 .show();
+    }
+
+    /** Listeners */
+
+    public class CardClickListener implements View.OnClickListener {
+        Game game;
+
+        public CardClickListener(Game game) {
+            this.game = game;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Context context = v.getContext();
+
+            switch(v.getId()) {
+
+                case R.id.card_detail:
+                    Intent i = new Intent(context, GameDetailActivity.class);
+                    i.putExtra("game_id", game.getId());
+                    context.startActivity(i);
+                    break;
+
+                case R.id.card_create:
+                    Intent alarmIntent = new Intent(context, AddAlarmActivity.class);
+                    alarmIntent.putExtra("game", game);
+                    ((MainActivity) context).startActivityForResult(alarmIntent, ADD_NEW_ALARM);
+                    break;
+
+                case R.id.card_edit:
+                    Intent gameIntent = new Intent(context, NewGameActivity.class);
+                    gameIntent.putExtra("flag", 2);
+                    gameIntent.putExtra("game", game);
+                    context.startActivity(gameIntent);
+                    break;
+
+                case R.id.card_delete:
+                    showDeleteDialog(v, game);
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }

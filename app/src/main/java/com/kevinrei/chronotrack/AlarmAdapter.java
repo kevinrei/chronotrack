@@ -59,7 +59,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             mProgressBar = (ProgressBar) v.findViewById(R.id.progressBar);
             mAlarmDelete = (ImageView) v.findViewById(R.id.delete_alarm);
 
-            countdown = new Countdown(mTimeLeft);
+            countdown = new Countdown(mTimeLeft, mProgressBar);
         }
     }
 
@@ -98,7 +98,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         String triggerTime = getAlarmTriggerTime(alarm.getTrigger()).trim();
         viewHolder.mTriggerTime.setText(triggerTime);
 
-        viewHolder.countdown.updateTextView(alarm);
+        viewHolder.countdown.updateTextAndProgress(alarm);
 
         // Stamina progress, only displayed if flag == 1
         if (flag == 1) {
@@ -108,8 +108,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         } else {
             viewHolder.mStaminaProgress.setVisibility(View.GONE);
         }
-
-        // Progress bar
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,10 +184,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         }
 
         return trigger.toString();
-    }
-
-    private void setProgressBar(ProgressBar bar) {
-
     }
 
     /** Alert Dialogs */

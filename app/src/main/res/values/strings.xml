@@ -34,6 +34,10 @@
     <string name="game_title">Title</string>
     <string name="game_category">Category</string>
     <string name="reorder_handle">Reorder</string>
+    <string name="card_create">CREATE ALARM</string>
+    <string name="card_edit">EDIT ENTRY</string>
+    <string name="card_delete">DELETE GAME</string>
+
     <string name="delete_confirm_game">Are you sure you want to delete this game?</string>
     <string name="delete_confirm_alarm">Are you sure you want to delete this alarm?</string>
 

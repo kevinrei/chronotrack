@@ -27,7 +27,6 @@ public class GameListFragment extends Fragment implements GameAdapter.OnStartDra
     protected List<Game> games;
 
     protected ItemTouchHelper mItemTouchHelper;
-    protected GameAdapter.OnStartDragListener mOnStartDragListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

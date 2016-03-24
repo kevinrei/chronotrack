@@ -1,6 +1,8 @@
 package com.kevinrei.chronotrack;
 
 import android.os.CountDownTimer;
+import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class Countdown {
@@ -11,25 +13,28 @@ public class Countdown {
     private static final int HOUR = 60 * MINUTE;
     private static final int DAY = 24 * HOUR;
 
-    private TextView mTextView;
+    private TextView mText;
+    private ProgressBar mProgress;
     private CountDownTimer mCountdown;
 
-    public Countdown(TextView mTextView) {
-        this.mTextView = mTextView;
+    public Countdown(TextView mText, ProgressBar mProgress) {
+        this.mText = mText;
+        this.mProgress = mProgress;
     }
 
-    public void updateTextView(Alarm alarm) {
+    public void updateTextAndProgress(Alarm alarm) {
         cleanCountdown();
         long endTime = alarm.getCountdown();
 
-        processCountdownAndUpdate(mTextView, endTime);
+        processCountdownAndUpdate(mText, mProgress, endTime);
     }
 
-    private void processCountdownAndUpdate(final TextView mTextView, long endTime) {
+    private void processCountdownAndUpdate(final TextView mText, ProgressBar mProgress, long endTime) {
         if (endTime > System.currentTimeMillis()) {
             long duration = getDuration(endTime);
+
             if (duration != 0) {
-                startCountdown(mTextView, duration);
+                startCountdown(mText, mProgress, duration);
             }
         }
     }
@@ -44,7 +49,7 @@ public class Countdown {
         return duration;
     }
 
-    private void startCountdown(final TextView mTextView, long duration) {
+    private void startCountdown(final TextView mText, final ProgressBar mProgress, long duration) {
         mCountdown = new CountDownTimer(duration, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -80,8 +85,7 @@ public class Countdown {
                     }
                 }
 
-                // Only show seconds when less than a minute
-                else if (millisUntilFinished >= SECOND) {
+                if (millisUntilFinished >= SECOND) {
                     value = millisUntilFinished / SECOND;
                     if (value == 1) {
                         trigger.append(millisUntilFinished / SECOND).append( "second" );
@@ -90,12 +94,16 @@ public class Countdown {
                     }
                 }
 
-                mTextView.setText(trigger.toString());
+                mText.setText(trigger.toString());
+
+                int percentage = Math.round((mProgress.getProgress() / (millisUntilFinished / 1000)) * 100);
+                mProgress.setProgress(percentage);
             }
 
             @Override
             public void onFinish() {
-                mTextView.setText("Finished!");
+                mText.setText("Finished!");
+                mProgress.setProgress(mProgress.getProgress() + 1);
             }
         }.start();
     }

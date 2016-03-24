@@ -6,6 +6,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
+    android:background="@color/colorPrimaryLight"
     android:orientation="vertical"
     style="@style/Padding">
 
@@ -38,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/alarm_label"
                 android:textSize="32sp"
-                android:textColorHint="@color/textIcons"
+                android:textColorHint="@color/textAndIcons"
                 android:singleLine="true"
                 android:background="@android:color/transparent"/>
 
@@ -89,6 +90,8 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_weight="1"
+            android:progress="0"
+            android:max="100"
             style="@android:style/Widget.ProgressBar.Horizontal" />
 
 

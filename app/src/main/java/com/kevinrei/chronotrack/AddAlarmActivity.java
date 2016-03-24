@@ -166,7 +166,7 @@ public class AddAlarmActivity extends AppCompatActivity {
         // Mobile game with stamina system
         if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
             mSwitch.setEnabled(true);
-            mStaminaLabel.setTextColor(getResources().getColor(R.color.textIcons));
+            mStaminaLabel.setTextColor(getResources().getColor(R.color.textAndIcons));
         } else {
             layoutFlag = LAYOUT_CONDITION_DATETIME;
             mViewSwitcher.showNext();
