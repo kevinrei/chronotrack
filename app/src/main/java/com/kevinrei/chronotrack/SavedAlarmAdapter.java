@@ -109,13 +109,13 @@ public class SavedAlarmAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         db = new MySQLiteHelper(viewHolder.itemView.getContext());
         Game game = db.getGame(gameId);
 
+        String gameUnit = game.getUnit();
+        int gameRate = game.getRecoveryRate();
+        int gameMax = game.getMaxStamina();
+
         switch(viewHolder.getItemViewType()) {
             case HEADER_VIEW:
                 HeaderViewHolder headerViewHolder = (HeaderViewHolder) viewHolder;
-
-                String gameUnit = game.getUnit();
-                int gameRate = game.getRecoveryRate();
-                int gameMax = game.getMaxStamina();
 
                 // Max [unit] value:
                 String labelMax = "Max " + gameUnit + " value:";
@@ -159,7 +159,7 @@ public class SavedAlarmAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 alarmViewHolder.mTriggerTime.setText(triggerTime);
 
                 // Time remaining until alarm is fired
-                mCountdown = new CountDownTimer(alarm.getTrigger(), game.getRecoveryRate()) {
+                mCountdown = new CountDownTimer(alarm.getTrigger(), gameRate) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         alarmViewHolder.mTimeLeft.setText(getAlarmTriggerTime(millisUntilFinished));

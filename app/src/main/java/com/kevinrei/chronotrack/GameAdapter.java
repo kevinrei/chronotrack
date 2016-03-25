@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -141,7 +143,85 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         return true;
     }
 
+    /** Listeners */
+
+    public class CardClickListener implements View.OnClickListener {
+        Game game;
+
+        public CardClickListener(Game game) {
+            this.game = game;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Context context = v.getContext();
+
+            switch(v.getId()) {
+
+                case R.id.card_detail:
+                    Intent i = new Intent(context, GameDetailActivity.class);
+                    i.putExtra("game_id", game.getId());
+                    context.startActivity(i);
+                    break;
+
+                case R.id.card_create:
+                    if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
+                        showCreateAlarmDialog(v, game);
+                    } else {
+                        Intent alarmIntent = new Intent(context, AddAlarmActivity.class);
+                        alarmIntent.putExtra("flag", 1);
+                        alarmIntent.putExtra("game", game);
+                        ((MainActivity) context).startActivityForResult(alarmIntent, ADD_NEW_ALARM);
+                    }
+                    break;
+
+                case R.id.card_edit:
+                    Intent gameIntent = new Intent(context, NewGameActivity.class);
+                    gameIntent.putExtra("flag", 2);
+                    gameIntent.putExtra("game", game);
+                    context.startActivity(gameIntent);
+                    break;
+
+                case R.id.card_delete:
+                    showDeleteDialog(v, game);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
     /** Alert Dialogs */
+
+    private void showCreateAlarmDialog(final View v, final Game game) {
+        CharSequence[] options = new CharSequence[] { "Stamina Alarm", "Countdown Alarm" };
+
+        final Context context = v.getContext();
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+
+        mBuilder.setTitle("Select Alarm Type");
+        mBuilder.setCancelable(false);
+
+        mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(context, AddAlarmActivity.class);
+                i.putExtra("flag", which);
+                i.putExtra("game", game);
+                ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
+            }
+        });
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mBuilder.show();
+    }
 
     private void showDeleteDialog(final View v, final Game game) {
         final Context context = v.getContext();
@@ -167,49 +247,5 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 })
                 .create()
                 .show();
-    }
-
-    /** Listeners */
-
-    public class CardClickListener implements View.OnClickListener {
-        Game game;
-
-        public CardClickListener(Game game) {
-            this.game = game;
-        }
-
-        @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-
-            switch(v.getId()) {
-
-                case R.id.card_detail:
-                    Intent i = new Intent(context, GameDetailActivity.class);
-                    i.putExtra("game_id", game.getId());
-                    context.startActivity(i);
-                    break;
-
-                case R.id.card_create:
-                    Intent alarmIntent = new Intent(context, AddAlarmActivity.class);
-                    alarmIntent.putExtra("game", game);
-                    ((MainActivity) context).startActivityForResult(alarmIntent, ADD_NEW_ALARM);
-                    break;
-
-                case R.id.card_edit:
-                    Intent gameIntent = new Intent(context, NewGameActivity.class);
-                    gameIntent.putExtra("flag", 2);
-                    gameIntent.putExtra("game", game);
-                    context.startActivity(gameIntent);
-                    break;
-
-                case R.id.card_delete:
-                    showDeleteDialog(v, game);
-                    break;
-
-                default:
-                    break;
-            }
-        }
     }
 }

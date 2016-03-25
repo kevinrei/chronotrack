@@ -1,10 +1,13 @@
 package com.kevinrei.chronotrack;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -110,9 +113,15 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_add_alarm) {
-            Intent i = new Intent(this, AddAlarmActivity.class);
-            i.putExtra("game", game);
-            startActivityForResult(i, ADD_NEW_ALARM);
+            if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
+                showCreateAlarmDialog(game);
+            } else {
+                Intent i = new Intent(this, AddAlarmActivity.class);
+                i.putExtra("flag", 1);
+                i.putExtra("game", game);
+                startActivityForResult(i, ADD_NEW_ALARM);
+            }
+
             return true;
         }
 
@@ -141,5 +150,34 @@ public class GameDetailActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    private void showCreateAlarmDialog(final Game game) {
+        CharSequence[] options = new CharSequence[] { "Stamina Alarm", "Countdown Alarm" };
+
+        final Context context = getApplicationContext();
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+
+        mBuilder.setTitle("Select Alarm Type");
+        mBuilder.setCancelable(false);
+
+        mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(context, AddAlarmActivity.class);
+                i.putExtra("flag", which);
+                i.putExtra("game", game);
+                ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
+            }
+        });
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mBuilder.show();
     }
 }

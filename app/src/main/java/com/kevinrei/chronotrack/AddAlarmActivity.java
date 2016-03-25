@@ -21,34 +21,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.ViewSwitcher;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class AddAlarmActivity extends AppCompatActivity {
 
     /** Layout flags */
-    private static final int LAYOUT_STAMINA = 1;
-    private static final int LAYOUT_CONDITION_DATETIME = 2;
-    private static final int LAYOUT_CONDITION_COUNTDOWN = 3;
-
-    int layoutFlag = 1;
-    boolean isDateTimeCountdown = true;
+    private static final int LAYOUT_ADD_STAMINA_ALARM = 0;
+    private static final int LAYOUT_ADD_CONDITION_ALARM = 1;
+    int layoutFlag = 2;
 
     /** Database and data values */
     MySQLiteHelper db;
@@ -56,9 +40,6 @@ public class AddAlarmActivity extends AppCompatActivity {
 
     /** General */
     protected View mView;
-    protected ViewSwitcher mViewSwitcher;
-    protected Switch mSwitch;
-    protected TextView mStaminaLabel;
     protected EditText mAlarmLabel;
     protected CheckBox mCheckSave;
 
@@ -68,50 +49,36 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected NumberPicker mGoalPicker;
 
     /** Condition Layout */
-    protected RelativeLayout mDateTimeLayout;
-    protected LinearLayout mCountdownLayout;
-    protected RadioGroup mRadioGroup;
-    protected RadioButton mRadioButton;
-
-    protected Button mSetDateButton;
-    protected TextView mCurrentDateText;
-
-    protected Button mSetTimeButton;
-    protected TextView mCurrentTimeText;
-
     protected Button mSetReminderButton;
     protected TextView mCurrentReminderText;
 
     /** Date & Time */
-    final Calendar c = Calendar.getInstance();
-    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-
-    String goalDate;
-    String goalTime;
     String goalReminder;
-
     long reminderValue;
-
-    int mYear;
-    int mMonth;
-    int mDay;
-    int mHour;
-    int mMinute;
 
     /** Alarm variables */
     public static AlarmManager mAlarmManager;
     public static PendingIntent mPendingIntent;
-
     public static Context context;
     public static Intent notifyIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_alarm);
-        mView = findViewById(R.id.main_content);
 
+        Intent i = getIntent();
+        layoutFlag = i.getIntExtra("flag", 1);
+        game = (Game) i.getSerializableExtra("game");
+
+        if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
+            setContentView(R.layout.activity_add_stamina_alarm);
+            initStaminaLayout();
+        } else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
+            setContentView(R.layout.activity_add_countdown_alarm);
+            initConditionLayout();
+        }
+
+        mView = findViewById(R.id.main_content);
         db = new MySQLiteHelper(this);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -121,59 +88,24 @@ public class AddAlarmActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_home);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
+                getSupportActionBar().setTitle("Create New Stamina Alarm");
+            } else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
+                getSupportActionBar().setTitle("Create New Condition Alarm");
+            }
         }
 
-        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        Intent i = getIntent();
-        game = (Game) i.getSerializableExtra("game");
-
-        mViewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
-        mSwitch = (Switch) findViewById(R.id.switch_layout);
-
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!isChecked) {
-                    layoutFlag = LAYOUT_STAMINA;
-                    mCheckSave.setVisibility(View.VISIBLE);
-                } else {
-                    layoutFlag = LAYOUT_CONDITION_DATETIME;
-                    if (isDateTimeCountdown) {
-                        mCheckSave.setVisibility(View.GONE);
-                    } else {
-                        mCheckSave.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-        });
-
-        mStaminaLabel = (TextView) findViewById(R.id.lbl_stamina_layout);
-
-        mAlarmLabel = (EditText) findViewById(R.id.alarm_label);
         mCheckSave = (CheckBox) findViewById(R.id.cb_save);
-
-        initStaminaLayout();
-        initConditionLayout();
-
-        mSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewSwitcher.showNext();
-            }
-        });
 
         // Mobile game with stamina system
         if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
-            mSwitch.setEnabled(true);
-            mStaminaLabel.setTextColor(getResources().getColor(R.color.textAndIcons));
+            layoutFlag = LAYOUT_ADD_STAMINA_ALARM;
         } else {
-            layoutFlag = LAYOUT_CONDITION_DATETIME;
-            mViewSwitcher.showNext();
-            mSwitch.setChecked(true);
-            mSwitch.setEnabled(false);
-            mStaminaLabel.setPaintFlags(mStaminaLabel.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            layoutFlag = LAYOUT_ADD_CONDITION_ALARM;
         }
+
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     @Override
@@ -204,7 +136,7 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             Log.d("layout", String.valueOf(layoutFlag));
 
-            if (layoutFlag == LAYOUT_STAMINA) {
+            if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
                 current = mCurrentPicker.getValue();
                 goal = mGoalPicker.getValue();
 
@@ -212,21 +144,7 @@ public class AddAlarmActivity extends AppCompatActivity {
                 saveAfter = mCheckSave.isChecked();
             }
 
-            else if (layoutFlag == LAYOUT_CONDITION_DATETIME) {
-                Date conditionGoal = getGoal(goalDate, goalTime);
-                alarmTriggerTime = conditionGoal.getTime() - c.getTimeInMillis();
-
-                if (alarmTriggerTime < 0) {
-                    Snackbar.make(mView, "Invalid time. Please try a different time.",
-                            Snackbar.LENGTH_LONG).show();
-
-                    return false;
-                }
-
-                saveAfter = false;
-            }
-
-            else if (layoutFlag == LAYOUT_CONDITION_COUNTDOWN) {
+            else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
                 alarmTriggerTime = reminderValue;
                 saveAfter = mCheckSave.isChecked();
             }
@@ -313,52 +231,15 @@ public class AddAlarmActivity extends AppCompatActivity {
     }
 
     private void initConditionLayout() {
-        mDateTimeLayout = (RelativeLayout) findViewById(R.id.layout_datetime);
-        mCountdownLayout = (LinearLayout) findViewById(R.id.layout_countdown);
-
-        mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-
-        mSetDateButton = (Button) findViewById(R.id.btn_set_date);
-        mCurrentDateText = (TextView) findViewById(R.id.current_date);
-
-        mSetTimeButton = (Button) findViewById(R.id.btn_set_time);
-        mCurrentTimeText = (TextView) findViewById(R.id.current_time);
-
         mSetReminderButton = (Button) findViewById(R.id.btn_set_reminder);
         mCurrentReminderText = (TextView) findViewById(R.id.current_reminder);
 
-        mSetDateButton.setOnClickListener(mButtonClickListener);
-        mSetTimeButton.setOnClickListener(mButtonClickListener);
-        mSetReminderButton.setOnClickListener(mButtonClickListener);
-
-        mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mSetReminderButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                mRadioButton = (RadioButton) group.findViewById(checkedId);
-
-                if (mRadioButton.getText().equals(getString(R.string.set_datetime))) {
-                    isDateTimeCountdown = true;
-                    layoutFlag = LAYOUT_CONDITION_DATETIME;
-                    mDateTimeLayout.setVisibility(View.VISIBLE);
-                    mCountdownLayout.setVisibility(View.GONE);
-                    mCheckSave.setVisibility(View.GONE);
-                } else {
-                    isDateTimeCountdown = false;
-                    layoutFlag = LAYOUT_CONDITION_COUNTDOWN;
-                    mDateTimeLayout.setVisibility(View.GONE);
-                    mCountdownLayout.setVisibility(View.VISIBLE);
-                    mCheckSave.setVisibility(View.VISIBLE);
-                }
+            public void onClick(View v) {
+                showSetCountdownDialog();
             }
         });
-
-        Date today = c.getTime();
-
-        goalDate = sdfDate.format(today);
-        goalTime = sdfTime.format(today);
-
-        mCurrentDateText.setText(goalDate);
-        mCurrentTimeText.setText(goalTime);
     }
 
     private void showSetCountdownDialog() {
@@ -422,121 +303,14 @@ public class AddAlarmActivity extends AppCompatActivity {
                 }).show();
     }
 
-    private String formatTime(int hourOfDay, int minute) {
-        String formatted;
-        String min;
-        String am = " AM";
-        String pm = " PM";
-
-        if (minute < 10) {
-            min = "0" + minute;
-        } else {
-            min = String.valueOf(minute);
-        }
-
-        if (hourOfDay == 0) {
-            formatted = 12 + ":" + min + am;
-        } else if (hourOfDay < 10) {
-            formatted = "0" + hourOfDay + ":" + min + am;
-        } else if (hourOfDay < 12) {
-            formatted = hourOfDay + ":" + min + am;
-        } else if (hourOfDay == 12) {
-            formatted = hourOfDay + ":" + min + pm;
-        } else {
-            formatted = "0" + (hourOfDay - 12) + ":" + min + pm;
-        }
-
-        return formatted;
-    }
-
-    private Date getGoal(String date, String time) {
-        Date goal = c.getTime();
-
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
-        String dateTime = date + " " + time;
-
-        try {
-            goal = format.parse(dateTime);
-        } catch (ParseException e) {
-            e.getMessage();
-        }
-
-        return goal;
-    }
-
     // Check if the EditText field is empty
     private boolean isEmpty(EditText editText) {
         return editText.getText().toString().trim().length() == 0;
     }
 
-
-    /** Listeners */
-
-    private View.OnClickListener mButtonClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-
-            switch(v.getId()) {
-                case R.id.btn_set_date:
-                    mYear = c.get(Calendar.YEAR);
-                    mMonth = c.get(Calendar.MONTH);
-                    mDay = c.get(Calendar.DAY_OF_MONTH);
-
-                    DatePickerDialog dp = new DatePickerDialog(context,
-                            new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view,
-                                              int year, int monthOfYear, int dayOfMonth) {
-                            goalDate = (monthOfYear + 1) + "/" + dayOfMonth + "/" + year;
-                            mCurrentDateText.setText(goalDate);
-                        }
-                    }, mYear, mMonth, mDay);
-
-                    dp.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-                    dp.setTitle("");
-                    dp.setCancelable(false);
-
-                    dp.show();
-
-                    break;
-
-                case R.id.btn_set_time:
-                    mHour = c.get(Calendar.HOUR_OF_DAY);
-                    mMinute = c.get(Calendar.MINUTE);
-
-                    TimePickerDialog tp = new TimePickerDialog(context,
-                            new TimePickerDialog.OnTimeSetListener() {
-                                @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    goalTime = hourOfDay + ":" + minute;
-
-                                    if (hourOfDay < 12) {
-                                        goalTime += " AM";
-                                    } else {
-                                        goalTime += " PM";
-                                    }
-
-                                    String formatted = formatTime(hourOfDay, minute);
-                                    mCurrentTimeText.setText(formatted);
-                                }
-                            }, mHour, mMinute, false);
-
-                    tp.setCancelable(false);
-                    tp.show();
-
-                    break;
-
-                case R.id.btn_set_reminder:
-                    showSetCountdownDialog();
-                    break;
-            }
-        }
-    };
-
-    public static void cancelAlarm(int aid) {
+    public static void cancelAlarm(int alarmId) {
         if (mAlarmManager != null) {
-            PendingIntent cancelIntent = PendingIntent.getBroadcast(context, aid, notifyIntent, 0);
+            PendingIntent cancelIntent = PendingIntent.getBroadcast(context, alarmId, notifyIntent, 0);
             mAlarmManager.cancel(cancelIntent);
         }
     }
