@@ -77,20 +77,16 @@ public class GameDetailActivity extends AppCompatActivity {
 
         // Initialize the views
         mView = findViewById(R.id.main_content);
-        mSavedLabel = (TextView) findViewById(R.id.tv_saved_alarms);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_alarms);
 
         // Alarm list
         alarms = db.getAlarmsForGame(gameId);
 
-        String saved = "Saved Alarms for " + gameTitle;
-        mSavedLabel.setText(saved);
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
-        mSavedAlarmAdapter = new SavedAlarmAdapter(alarms);
+        mSavedAlarmAdapter = new SavedAlarmAdapter(gameId, alarms);
         mRecyclerView.setAdapter(mSavedAlarmAdapter);
     }
 
