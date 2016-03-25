@@ -2,6 +2,7 @@ package com.kevinrei.chronotrack;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,16 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class GameDetailActivity extends AppCompatActivity {
+
+    private static final int HORIZONTAL_MARGIN = 32;
+    private static final int VERTICAL_MARGIN = 32;
 
     /** Action code */
     private static final int ADD_NEW_ALARM = 2;
@@ -33,14 +41,8 @@ public class GameDetailActivity extends AppCompatActivity {
 
     /** Widgets and Fields */
     protected View mView;
-/*    protected RelativeLayout mDetailLayout;
-    protected TextView mLabelMax;
-    protected TextView mMaxValue;
-    protected TextView mRecoveryRate;
-    protected TextView mFullRecovery;*/
     protected TextView mSavedLabel;
 
-    protected LinearLayoutManager mLayoutManager;
     protected RecyclerView mRecyclerView;
     protected SavedAlarmAdapter mSavedAlarmAdapter;
     protected List<Alarm> alarms;
@@ -75,41 +77,8 @@ public class GameDetailActivity extends AppCompatActivity {
 
         // Initialize the views
         mView = findViewById(R.id.main_content);
-/*        mDetailLayout = (RelativeLayout) findViewById(R.id.layout_mobile_details);
-        mLabelMax = (TextView) findViewById(R.id.lbl_max);
-        mMaxValue = (TextView) findViewById(R.id.tv_max);
-        mRecoveryRate = (TextView) findViewById(R.id.tv_rcv_rate);
-        mFullRecovery = (TextView) findViewById(R.id.tv_full_rcv);*/
         mSavedLabel = (TextView) findViewById(R.id.tv_saved_alarms);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_alarms);
-
-/*        // Hide the mobile detail layout if the game is not a mobile game
-        if (!game.getCategory().equals("Mobile game")) {
-            mDetailLayout.setVisibility(View.GONE);
-        } else {
-            mDetailLayout.setVisibility(View.VISIBLE);
-        }
-
-        // Max [unit] value:
-        String labelMax = "Max " + gameUnit + " value:";
-        mLabelMax.setText(labelMax);
-
-        // Max stamina value
-        if (gameMax == 0) {
-            mMaxValue.setText("N/A");
-        } else {
-            mMaxValue.setText(String.valueOf(gameMax));
-        }
-
-        // Recovery rate
-        if (gameRate == 0) {
-            mRecoveryRate.setText("N/A");
-        } else {
-            mRecoveryRate.setText(getRateString(gameUnit, gameRate));
-        }
-
-        // Full recovery time
-        mFullRecovery.setText(calculateTime(gameRate * gameMax));*/
 
         // Alarm list
         alarms = db.getAlarmsForGame(gameId);
@@ -117,9 +86,9 @@ public class GameDetailActivity extends AppCompatActivity {
         String saved = "Saved Alarms for " + gameTitle;
         mSavedLabel.setText(saved);
 
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
         mSavedAlarmAdapter = new SavedAlarmAdapter(alarms);
         mRecyclerView.setAdapter(mSavedAlarmAdapter);
@@ -176,57 +145,5 @@ public class GameDetailActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-
-    /** Custom methods */
-
-    public String getRateString(String unit, int rate) {
-        String result, timeUnit, rateValueString;
-        int rateValue;
-
-        rateValue = rate / 60;
-
-        // Get the unit of time measurement
-        if (rateValue == 1) {
-            timeUnit = "minute";
-        } else if (rateValue < 60) {
-            timeUnit = " minutes";
-        } else if (rateValue == 60) {
-            rateValue /= 60;
-            timeUnit = "hour";
-        } else {
-            rateValue /= 60;
-            timeUnit = " hours";
-        }
-
-        // Remove number if it's 1 minute or 1 hour
-        if (rateValue == 1) {
-            rateValueString = "";
-        } else {
-            rateValueString = String.valueOf(rateValue);
-        }
-
-        result = "1 " + unit + " every " + rateValueString + timeUnit;
-        return result;
-    }
-
-    private static String calculateTime(long totalSeconds) {
-        if (totalSeconds == 0) {
-            return "N/A";
-        }
-
-        final int MINUTES_IN_AN_HOUR = 60;
-        final int SECONDS_IN_A_MINUTE = 60;
-
-        long totalMinutes = totalSeconds / SECONDS_IN_A_MINUTE;
-        long minutes = totalMinutes % MINUTES_IN_AN_HOUR;
-        long hours = totalMinutes / MINUTES_IN_AN_HOUR;
-
-        if (hours == 0) {
-            return minutes + " minutes";
-        }
-
-        return hours + " hours " + minutes + " minutes";
     }
 }

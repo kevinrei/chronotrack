@@ -15,7 +15,6 @@
         android:clickable="true"
         android:focusable="true"
         android:foreground="?selectableItemBackground"
-        android:background="@color/colorPrimaryLight"
         android:orientation="vertical"
         style="@style/Padding">
 
@@ -48,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/alarm_label"
                     android:textSize="32sp"
-                    android:textColorHint="@color/textAndIcons"
+                    android:textColorHint="@color/textPrimary"
                     android:singleLine="true"
                     android:background="@android:color/transparent"/>
 
