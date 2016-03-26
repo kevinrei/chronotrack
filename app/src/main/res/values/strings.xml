@@ -18,20 +18,21 @@
     <string name="action_add_uninstalled">Add Game Not On Device</string>
 
     <!-- Add New Game -->
-    <string name="hint_title">Title</string>
     <string name="btn_change">Change</string>
     <string name="lbl_category">Category</string>
-    <string name="hint_unit">Unit (e.g. Energy, Hearts, Keys)</string>
-    <string name="lbl_rate">Recovery Rate</string>
+    <string name="hint_title">Title</string>
+    <string name="lbl_unit">Unit</string>
+    <string name="hint_unit">e.g. Energy, Heart, Key</string>
+    <string name="lbl_rate">RCV</string>
+    <string name="hint_rate">Recovery Rate in Minutes</string>
+    <string name="lbl_maximum">MAX</string>
     <string name="hint_max">Maximum Stamina Value</string>
     <string name="unfilled_title">The title is missing.</string>
-    <string name="invalid_max">The MAX value must be &gt;= 0 and &lt;= 999.</string>
     <string name="hint_url">Enter URL</string>
     <string name="unfilled_url">The URL is missing.</string>
     <string name="invalid_url">The URL is invalid.</string>
 
     <!-- Game List Item -->
-    <string name="game_title">Title</string>
     <string name="game_category">Category</string>
     <string name="reorder_handle">Reorder</string>
     <string name="card_create">CREATE ALARM</string>

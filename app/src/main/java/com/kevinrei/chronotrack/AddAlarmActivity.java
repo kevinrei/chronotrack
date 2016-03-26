@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.wefika.horizontalpicker.HorizontalPicker;
+
 public class AddAlarmActivity extends AppCompatActivity {
 
     /** Layout flags */
@@ -35,8 +37,8 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected CheckBox mCheckSave;
 
     /** Stamina Layout */
-    protected NumberPicker mCurrentPicker;
-    protected NumberPicker mGoalPicker;
+    protected HorizontalPicker mCurrentPicker;
+    protected HorizontalPicker mGoalPicker;
 
     /** Condition Layout */
     protected TextView mDay;
@@ -135,8 +137,8 @@ public class AddAlarmActivity extends AppCompatActivity {
             Log.d("layout", String.valueOf(layoutFlag));
 
             if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
-                current = mCurrentPicker.getValue();
-                goal = mGoalPicker.getValue();
+                current = mCurrentPicker.getSelectedItem();
+                goal = mGoalPicker.getSelectedItem();
 
                 alarmTriggerTime = game.getRecoveryRate() * (goal - current) * 1000;
                 saveAfter = mCheckSave.isChecked();
@@ -199,8 +201,8 @@ public class AddAlarmActivity extends AppCompatActivity {
     /** Custom methods */
 
     private void initStaminaLayout() {
-        mCurrentPicker = (NumberPicker) findViewById(R.id.picker_current);
-        mGoalPicker = (NumberPicker) findViewById(R.id.picker_goal);
+        mCurrentPicker = (HorizontalPicker) findViewById(R.id.picker_current);
+        mGoalPicker = (HorizontalPicker) findViewById(R.id.picker_goal);
 
         int min = 0;
         int max = game.getMaxStamina();
@@ -210,17 +212,11 @@ public class AddAlarmActivity extends AppCompatActivity {
             values[i] = Integer.toString(i);
         }
 
-        mCurrentPicker.setMinValue(min);
-        mCurrentPicker.setMaxValue(max);
-        mCurrentPicker.setValue(min);
-        mCurrentPicker.setDisplayedValues(values);
-        mCurrentPicker.setWrapSelectorWheel(false);
+        mCurrentPicker.setValues(values);
+        mCurrentPicker.setSelectedItem(min);
 
-        mGoalPicker.setMinValue(min);
-        mGoalPicker.setMaxValue(max);
-        mGoalPicker.setValue(max);
-        mGoalPicker.setDisplayedValues(values);
-        mGoalPicker.setWrapSelectorWheel(false);
+        mGoalPicker.setValues(values);
+        mGoalPicker.setSelectedItem(max);
     }
 
     private void initConditionLayout() {

@@ -59,7 +59,7 @@ public class NewGameActivity extends AppCompatActivity {
     protected ImageView mImage;
     protected Spinner mCategory;
     protected EditText mUnit;
-    protected Spinner mRecovery;
+    protected EditText mRecovery;
     protected EditText mStamina;
 
     /** Image */
@@ -87,7 +87,7 @@ public class NewGameActivity extends AppCompatActivity {
         mImage = (ImageView) findViewById(R.id.img_game);
         mCategory = (Spinner) findViewById(R.id.spn_category);
         mUnit = (EditText) findViewById(R.id.hint_unit);
-        mRecovery = (Spinner) findViewById(R.id.spn_rate);
+        mRecovery = (EditText) findViewById(R.id.hint_rate);
         mStamina = (EditText) findViewById(R.id.hint_max);
 
         // Get the intent and its flag, which is 1 or 2.
@@ -103,11 +103,6 @@ public class NewGameActivity extends AppCompatActivity {
                 this, R.array.category_array, android.R.layout.simple_spinner_item);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategory.setAdapter(categoryAdapter);
-
-        ArrayAdapter<CharSequence> rateAdapter = ArrayAdapter.createFromResource(
-                this, R.array.recovery_rate_array, android.R.layout.simple_spinner_item);
-        rateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mRecovery.setAdapter(rateAdapter);
 
         if (flag == 1) {
             // An installed app was selected
@@ -142,7 +137,7 @@ public class NewGameActivity extends AppCompatActivity {
         savedInstanceState.putString("mImage", imgContent);
         savedInstanceState.putInt("mCategory", mCategory.getSelectedItemPosition());
         savedInstanceState.putString("mUnit", mUnit.getText().toString());
-        savedInstanceState.putInt("mRecovery", mRecovery.getSelectedItemPosition());
+        savedInstanceState.putString("mRecovery", mRecovery.getText().toString());
         savedInstanceState.putString("mStamina", mStamina.getText().toString());
     }
 
@@ -154,7 +149,7 @@ public class NewGameActivity extends AppCompatActivity {
         Picasso.with(getApplicationContext()).load(imgContent).into(mImage);
         mCategory.setSelection(savedInstanceState.getInt("mCategory"), false);
         mUnit.setText(savedInstanceState.getString("mUnit"));
-        mRecovery.setSelection(savedInstanceState.getInt("mRecovery"));
+        mRecovery.setText(savedInstanceState.getString("mRecovery"));
         mStamina.setText(savedInstanceState.getString("mStamina"));
     }
 
@@ -180,11 +175,6 @@ public class NewGameActivity extends AppCompatActivity {
         else if (id == R.id.action_save) {
             if (isEmpty(mTitle)) {
                 Snackbar.make(mView, getString(R.string.unfilled_title), Snackbar.LENGTH_SHORT).show();
-                return false;
-            }
-
-            if (!isEmpty(mStamina) && !isValidMax(mStamina)) {
-                Snackbar.make(mView, getString(R.string.invalid_max), Snackbar.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -302,16 +292,10 @@ public class NewGameActivity extends AppCompatActivity {
         return editText.getText().toString().trim().length() == 0;
     }
 
-    // Check if max stamina is within range
-    private boolean isValidMax(EditText editText) {
-        int val = Integer.parseInt(editText.getText().toString());
-        return (val >= 0 && val <= 999);
-    }
-
     // Get the recovery rate integer value (in seconds)
-    private int getRateValue(Spinner rate) {
-        int[] mRateValueArray = getResources().getIntArray(R.array.recovery_rate_value_array);
-        return mRateValueArray[rate.getSelectedItemPosition()];
+    private int getRateValue(EditText rate) {
+        String value = rate.getText().toString();
+        return Integer.parseInt(value) * 60;
     }
 
     private void getExistingGameData(Intent i) {
@@ -326,11 +310,11 @@ public class NewGameActivity extends AppCompatActivity {
 
         if (appCategory.equals("Mobile game")) {
             String appUnit = game.getUnit();
-            int appRecovery = game.getRecoveryRate();
+            int appRecovery = game.getRecoveryRate() / 60;
             int appMax = game.getMaxStamina();
 
             mUnit.setHint(appUnit);
-            mRecovery.setSelection(getArrayPosition(appRecovery));
+            mRecovery.setHint(String.valueOf(appRecovery));
             mStamina.setHint(String.valueOf(appMax));
         }
 
@@ -341,17 +325,6 @@ public class NewGameActivity extends AppCompatActivity {
 
         String[] categoryArray = getResources().getStringArray(R.array.category_array);
         mCategory.setSelection(Arrays.asList(categoryArray).indexOf(appCategory), false);
-    }
-
-    private int getArrayPosition(int value) {
-        int[] recoveryArray = getResources().getIntArray(R.array.recovery_rate_value_array);
-
-        Integer[] retrievableArray = new Integer[recoveryArray.length];
-        for (int i = 0; i < recoveryArray.length; i++) {
-            retrievableArray[i] = recoveryArray[i];
-        }
-
-        return Arrays.asList(retrievableArray).indexOf(value);
     }
 
     // Update the database with the new game
