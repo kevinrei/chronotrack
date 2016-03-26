@@ -1,21 +1,14 @@
 package com.kevinrei.chronotrack;
 
 import android.app.AlarmManager;
-import android.app.DatePickerDialog;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +17,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 public class AddAlarmActivity extends AppCompatActivity {
 
@@ -44,17 +35,30 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected CheckBox mCheckSave;
 
     /** Stamina Layout */
-    protected TextView mCalcUnit;
     protected NumberPicker mCurrentPicker;
     protected NumberPicker mGoalPicker;
 
     /** Condition Layout */
-    protected Button mSetReminderButton;
-    protected TextView mCurrentReminderText;
+    protected TextView mDay;
+    protected TextView mHour;
+    protected TextView mMinute;
+    protected TextView mSecond;
+    protected Button mOne;
+    protected Button mTwo;
+    protected Button mThree;
+    protected Button mFour;
+    protected Button mFive;
+    protected Button mSix;
+    protected Button mSeven;
+    protected Button mEight;
+    protected Button mNine;
+    protected Button mZero;
 
-    /** Date & Time */
-    String goalReminder;
-    long reminderValue;
+    int position = 7;
+    String day;
+    String hour;
+    String minute;
+    String second;
 
     /** Alarm variables */
     public static AlarmManager mAlarmManager;
@@ -90,22 +94,16 @@ public class AddAlarmActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
-                getSupportActionBar().setTitle("Create New Stamina Alarm");
+                getSupportActionBar().setTitle("New Stamina Alarm");
             } else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
-                getSupportActionBar().setTitle("Create New Condition Alarm");
+                getSupportActionBar().setTitle("New Countdown Alarm");
             }
         }
 
         mCheckSave = (CheckBox) findViewById(R.id.cb_save);
-
-        // Mobile game with stamina system
-        if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
-            layoutFlag = LAYOUT_ADD_STAMINA_ALARM;
-        } else {
-            layoutFlag = LAYOUT_ADD_CONDITION_ALARM;
-        }
-
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Log.d("layout_flag", String.valueOf(layoutFlag));
     }
 
     @Override
@@ -145,7 +143,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             }
 
             else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
-                alarmTriggerTime = reminderValue;
+                alarmTriggerTime = getTriggerTime();
                 saveAfter = mCheckSave.isChecked();
             }
 
@@ -201,11 +199,6 @@ public class AddAlarmActivity extends AppCompatActivity {
     /** Custom methods */
 
     private void initStaminaLayout() {
-        mCalcUnit = (TextView) findViewById(R.id.lbl_unit);
-
-        String calc = "Calculate " + game.getUnit() + " recovery time";
-        mCalcUnit.setText(calc);
-
         mCurrentPicker = (NumberPicker) findViewById(R.id.picker_current);
         mGoalPicker = (NumberPicker) findViewById(R.id.picker_goal);
 
@@ -231,81 +224,56 @@ public class AddAlarmActivity extends AppCompatActivity {
     }
 
     private void initConditionLayout() {
-        mSetReminderButton = (Button) findViewById(R.id.btn_set_reminder);
-        mCurrentReminderText = (TextView) findViewById(R.id.current_reminder);
+        mDay = (TextView) findViewById(R.id.input_day);
+        mHour = (TextView) findViewById(R.id.input_hour);
+        mMinute = (TextView) findViewById(R.id.input_minute);
+        mSecond = (TextView) findViewById(R.id.input_second);
 
-        mSetReminderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showSetCountdownDialog();
-            }
-        });
-    }
+        mOne = (Button) findViewById(R.id.one);
+        mTwo = (Button) findViewById(R.id.two);
+        mThree = (Button) findViewById(R.id.three);
+        mFour = (Button) findViewById(R.id.four);
+        mFive = (Button) findViewById(R.id.five);
+        mSix = (Button) findViewById(R.id.six);
+        mSeven = (Button) findViewById(R.id.seven);
+        mEight = (Button) findViewById(R.id.eight);
+        mNine = (Button) findViewById(R.id.nine);
+        mZero = (Button) findViewById(R.id.zero);
 
-    private void showSetCountdownDialog() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        LayoutInflater mInflater = this.getLayoutInflater();
-        final View mDialogView = mInflater.inflate(R.layout.dialog_reminder_countdown, null);
-        mBuilder.setView(mDialogView);
-
-        final NumberPicker pickHour = (NumberPicker) mDialogView.findViewById(R.id.picker_hr);
-        final NumberPicker pickMinute = (NumberPicker) mDialogView.findViewById(R.id.picker_min);
-        final NumberPicker pickSecond = (NumberPicker) mDialogView.findViewById(R.id.picker_sec);
-
-        // Max value for hours is 7 days
-        String[] valuesHour = new String[169];
-        for (int i = 0; i < valuesHour.length; i++) {
-            valuesHour[i] = Integer.toString(i);
-        }
-
-        String[] valuesMS = new String[60];
-        for (int i = 0; i < valuesMS.length; i++) {
-            valuesMS[i] = Integer.toString(i);
-        }
-
-        pickHour.setMinValue(0);
-        pickHour.setMaxValue(168);
-        pickHour.setDisplayedValues(valuesHour);
-        pickHour.setWrapSelectorWheel(false);
-
-        pickMinute.setMinValue(0);
-        pickMinute.setMaxValue(59);
-        pickMinute.setDisplayedValues(valuesMS);
-
-        pickSecond.setMinValue(0);
-        pickSecond.setMaxValue(59);
-        pickSecond.setDisplayedValues(valuesMS);
-
-        mBuilder.setTitle("Set Countdown Time")
-                .setCancelable(false)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
-                .setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int seconds = pickSecond.getValue();
-                        int minutes = pickMinute.getValue();
-                        int hours = pickHour.getValue();
-
-                        reminderValue = (hours * 60 * 60 * 1000)
-                                + (minutes * 60 * 1000)
-                                + (seconds * 1000);
-
-                        goalReminder = String.format(Locale.getDefault(),
-                                "%02dh %02dm %02ds", hours, minutes, seconds);
-
-                        mCurrentReminderText.setText(goalReminder);
-                    }
-                }).show();
+        mOne.setOnClickListener(mButtonClickListener);
+        mTwo.setOnClickListener(mButtonClickListener);
+        mThree.setOnClickListener(mButtonClickListener);
+        mFour.setOnClickListener(mButtonClickListener);
+        mFive.setOnClickListener(mButtonClickListener);
+        mSix.setOnClickListener(mButtonClickListener);
+        mSeven.setOnClickListener(mButtonClickListener);
+        mEight.setOnClickListener(mButtonClickListener);
+        mNine.setOnClickListener(mButtonClickListener);
+        mZero.setOnClickListener(mButtonClickListener);
     }
 
     // Check if the EditText field is empty
     private boolean isEmpty(EditText editText) {
-        return editText.getText().toString().trim().length() == 0;
+        if (editText == null) {
+            return true;
+        } else {
+            return editText.getText().toString().trim().length() == 0;
+        }
+    }
+
+    private String removeLeadingZero(String str) {
+        if (str.charAt(0) == '0') {
+            return str.substring(1, str.length());
+        }
+
+        return str;
+    }
+
+    private long getTriggerTime() {
+        return  (Integer.parseInt(removeLeadingZero(day)) * 24 * 60 * 60 * 1000)
+                + (Integer.parseInt(removeLeadingZero(hour)) * 60 * 60 * 1000)
+                + (Integer.parseInt(removeLeadingZero(minute)) * 60 * 1000)
+                + (Integer.parseInt(removeLeadingZero(second)) * 1000);
     }
 
     public static void cancelAlarm(int alarmId) {
@@ -314,4 +282,86 @@ public class AddAlarmActivity extends AppCompatActivity {
             mAlarmManager.cancel(cancelIntent);
         }
     }
+
+    /** Listeners */
+
+    private View.OnClickListener mButtonClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            char input = '0';
+
+            switch(v.getId()) {
+                case R.id.one:
+                    input = mOne.getText().toString().charAt(0);
+                    break;
+
+                case R.id.two:
+                    input = mTwo.getText().toString().charAt(0);
+                    break;
+
+                case R.id.three:
+                    input = mThree.getText().toString().charAt(0);
+                    break;
+
+                case R.id.four:
+                    input = mFour.getText().toString().charAt(0);
+                    break;
+
+                case R.id.five:
+                    input = mFive.getText().toString().charAt(0);
+                    break;
+
+                case R.id.six:
+                    input = mSix.getText().toString().charAt(0);
+                    break;
+
+                case R.id.seven:
+                    input = mSeven.getText().toString().charAt(0);
+                    break;
+
+                case R.id.eight:
+                    input = mEight.getText().toString().charAt(0);
+                    break;
+
+                case R.id.nine:
+                    input = mNine.getText().toString().charAt(0);
+                    break;
+
+                case R.id.zero:
+                    input = mZero.getText().toString().charAt(0);
+                    break;
+            }
+
+            String secondText = mSecond.getText().toString();
+            String minuteText = mMinute.getText().toString();
+            String hourText = mHour.getText().toString();
+            String dayText = mDay.getText().toString();
+
+            String join = dayText + hourText + minuteText + secondText;
+            StringBuilder time = new StringBuilder(join);
+            if (position == 7) {
+                time.setCharAt(7, input);
+                position--;
+            } else if (position >= 0) {
+                for (int p = position; p < 7; p++) {
+                    time.setCharAt(p, join.charAt(p + 1));
+                }
+
+                time.setCharAt(7, input);
+                position--;
+            }
+
+            String t = time.toString();
+
+            day = t.substring(0, 2);
+            hour = t.substring(2, 4);
+            minute = t.substring(4, 6);
+            second = t.substring(6, 8);
+
+            mDay.setText(day);
+            mHour.setText(hour);
+            mMinute.setText(minute);
+            mSecond.setText(second);
+        }
+    };
 }

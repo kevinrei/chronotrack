@@ -44,7 +44,6 @@ public class GameDetailActivity extends AppCompatActivity {
 
     /** Widgets and Fields */
     protected View mView;
-    protected TextView mSavedLabel;
 
     protected RecyclerView mRecyclerView;
     protected SavedAlarmAdapter mSavedAlarmAdapter;
@@ -155,7 +154,7 @@ public class GameDetailActivity extends AppCompatActivity {
     private void showCreateAlarmDialog(final Game game) {
         CharSequence[] options = new CharSequence[] { "Stamina Alarm", "Countdown Alarm" };
 
-        final Context context = getApplicationContext();
+        final Context context = GameDetailActivity.this;
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
 
         mBuilder.setTitle("Select Alarm Type");
@@ -167,7 +166,7 @@ public class GameDetailActivity extends AppCompatActivity {
                 Intent i = new Intent(context, AddAlarmActivity.class);
                 i.putExtra("flag", which);
                 i.putExtra("game", game);
-                ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
+                startActivityForResult(i, ADD_NEW_ALARM);
             }
         });
 
