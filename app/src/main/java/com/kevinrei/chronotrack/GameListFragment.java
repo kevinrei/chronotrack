@@ -1,7 +1,7 @@
 package com.kevinrei.chronotrack;
 
-import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,10 +23,13 @@ public class GameListFragment extends Fragment implements GameAdapter.OnStartDra
 
     protected MySQLiteHelper db;
     protected RecyclerView mRecyclerView;
-    protected GameAdapter mGameAdapter;
     protected List<Game> games;
 
+    protected RecyclerView.LayoutManager mLayoutManager;
     protected ItemTouchHelper mItemTouchHelper;
+
+    public static  GameAdapter mGameAdapter;
+    Parcelable mListState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,11 +43,13 @@ public class GameListFragment extends Fragment implements GameAdapter.OnStartDra
         rootView.setTag(TAG);
 
         db = new MySQLiteHelper(getActivity());
+
         games = db.getAllGames();
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
@@ -62,5 +67,31 @@ public class GameListFragment extends Fragment implements GameAdapter.OnStartDra
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        mListState = mLayoutManager.onSaveInstanceState();
+        savedInstanceState.putParcelable("state_key", mListState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mListState != null) {
+            mListState = savedInstanceState.getParcelable("state_key");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mListState != null) {
+            mLayoutManager.onRestoreInstanceState(mListState);
+        }
     }
 }

@@ -33,7 +33,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
     }
 
-    private List<Game> games;
+    public static List<Game> games;
     private OnStartDragListener mStartDragListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder
@@ -43,6 +43,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         private final ImageView mGameImage;
         private final TextView mGameTitle;
         private final TextView mGameCategory;
+        private final ImageView mGameReorder;
         private final TextView mGameCreate;
         private final TextView mGameEdit;
         private final TextView mGameDelete;
@@ -54,6 +55,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             mGameImage = (ImageView) v.findViewById(R.id.game_img);
             mGameTitle = (TextView) v.findViewById(R.id.card_title);
             mGameCategory = (TextView) v.findViewById(R.id.card_category);
+            mGameReorder = (ImageView) v.findViewById(R.id.reorder_handle);
             mGameCreate  = (TextView) v.findViewById(R.id.card_create);
             mGameEdit = (TextView) v.findViewById(R.id.card_edit);
             mGameDelete = (TextView) v.findViewById(R.id.card_delete);
@@ -97,12 +99,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         viewHolder.mGameCategory.setText(game.getCategory());
 
         // Set listeners to card items
-        viewHolder.mGameDetail.setOnClickListener(new CardClickListener(game));
-        viewHolder.mGameCreate.setOnClickListener(new CardClickListener(game));
-        viewHolder.mGameEdit.setOnClickListener(new CardClickListener(game));
-        viewHolder.mGameDelete.setOnClickListener(new CardClickListener(game));
+        viewHolder.mGameDetail.setOnClickListener(new CardClickListener(game, position));
+        viewHolder.mGameCreate.setOnClickListener(new CardClickListener(game, position));
+        viewHolder.mGameEdit.setOnClickListener(new CardClickListener(game, position));
+        viewHolder.mGameDelete.setOnClickListener(new CardClickListener(game, position));
 
-        viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+        viewHolder.mGameReorder.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 v.setSelected(false);
@@ -147,9 +149,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
     public class CardClickListener implements View.OnClickListener {
         Game game;
+        int position;
 
-        public CardClickListener(Game game) {
+        public CardClickListener(Game game, int position) {
             this.game = game;
+            this.position = position;
         }
 
         @Override
@@ -183,7 +187,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                     break;
 
                 case R.id.card_delete:
-                    showDeleteDialog(v, game);
+                    showDeleteDialog(v, game, position);
                     break;
 
                 default:
@@ -223,7 +227,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         mBuilder.show();
     }
 
-    private void showDeleteDialog(final View v, final Game game) {
+    private void showDeleteDialog(final View v, final Game game, final int position) {
         final Context context = v.getContext();
         final MySQLiteHelper db = new MySQLiteHelper(context);
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
@@ -242,6 +246,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         db.deleteGame(game);
+
+                        games.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, games.size());
+
                         Snackbar.make(v, confirmDelete, Snackbar.LENGTH_LONG).show();
                     }
                 })

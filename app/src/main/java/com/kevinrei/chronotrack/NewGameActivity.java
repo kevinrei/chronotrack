@@ -294,8 +294,15 @@ public class NewGameActivity extends AppCompatActivity {
 
     // Get the recovery rate integer value (in seconds)
     private int getRateValue(EditText rate) {
-        String value = rate.getText().toString();
-        return Integer.parseInt(value) * 60;
+        int value;
+
+        if (isEmpty(rate)) {
+            value = 0;
+        } else {
+            value = Integer.parseInt(rate.getText().toString());
+        }
+
+        return value * 60;
     }
 
     private void getExistingGameData(Intent i) {
@@ -373,6 +380,8 @@ public class NewGameActivity extends AppCompatActivity {
         } else {
             db.addGame(game);
         }
+
+        notifyGameAdapter(game);
     }
 
     private void checkExternalPermissionThenStart() {
@@ -447,6 +456,14 @@ public class NewGameActivity extends AppCompatActivity {
         });
 
         mDialog.show();
+    }
+
+    public void notifyGameAdapter(Game game) {
+        int position = GameAdapter.games.size();
+
+        GameAdapter.games.add(position, game);
+        GameListFragment.mGameAdapter.notifyItemInserted(position);
+        GameListFragment.mGameAdapter.notifyItemRangeChanged(0, position);
     }
 
     /** android-crop */
