@@ -48,21 +48,14 @@
     <string name="lbl_full_rcv">Full recovery:</string>
 
     <!-- Create New Alarm -->
-    <string name="switch_stamina">Stamina</string>
-    <string name="switch_condition">Condition</string>
-    <string name="calculate_text">Calculate stamina recovery time</string>
     <string name="lbl_current">Current</string>
-    <string name="arrow">&gt;&gt;</string>
     <string name="lbl_goal">Goal</string>
-    <string name="condition_text">Set alarm condition</string>
+
     <string name="set_date">Set Date</string>
     <string name="set_time">Set Time</string>
-    <string name="set_datetime">Date &amp; Time</string>
-    <string name="set_countdown">Countdown</string>
-    <string name="filler_time">hh:mm a</string>
     <string name="filler_date">MM/dd/yyyy</string>
-    <string name="remind_me">Remind me in&#8230;</string>
-    <string name="default_reminder">00h 00m 00s</string>
+    <string name="filler_time">hh:mm a</string>
+
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="seconds">Seconds</string>
@@ -81,6 +74,7 @@
     <string name="eight">8</string>
     <string name="nine">9</string>
     <string name="zero">0</string>
+
     <string name="alarm_label">Label</string>
     <string name="check_save">Save this alarm</string>
 

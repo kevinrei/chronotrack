@@ -1,10 +1,13 @@
 package com.kevinrei.chronotrack;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,18 +17,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.wefika.horizontalpicker.HorizontalPicker;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class AddAlarmActivity extends AppCompatActivity {
 
     /** Layout flags */
     private static final int LAYOUT_ADD_STAMINA_ALARM = 0;
-    private static final int LAYOUT_ADD_CONDITION_ALARM = 1;
-    int layoutFlag = 2;
+    private static final int LAYOUT_ADD_DATETIME_ALARM = 1;
+    private static final int LAYOUT_ADD_CONDITION_ALARM = 2;
+    int layoutFlag;
 
     /** Database and data values */
     MySQLiteHelper db;
@@ -39,6 +50,26 @@ public class AddAlarmActivity extends AppCompatActivity {
     /** Stamina Layout */
     protected HorizontalPicker mCurrentPicker;
     protected HorizontalPicker mGoalPicker;
+
+    /** DateTime Layout */
+    protected Button mSetDateButton;
+    protected Button mSetTimeButton;
+    protected TextView mCurrentDate;
+    protected TextView mCurrentTime;
+
+    final Calendar c = Calendar.getInstance();
+    SimpleDateFormat sdfDate = new SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.getDefault());
+    SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
+    String triggerDate;
+    String triggerTime;
+
+    int dtYear;
+    int dtMonth;
+    int dtDay;
+
+    int dtHour;
+    int dtMinute;
 
     /** Condition Layout */
     protected TextView mDay;
@@ -73,12 +104,15 @@ public class AddAlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent i = getIntent();
-        layoutFlag = i.getIntExtra("flag", 1);
+        layoutFlag = i.getIntExtra("flag", 2);
         game = (Game) i.getSerializableExtra("game");
 
         if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
             setContentView(R.layout.activity_add_stamina_alarm);
             initStaminaLayout();
+        } else if (layoutFlag == LAYOUT_ADD_DATETIME_ALARM) {
+            setContentView(R.layout.activity_add_datetime_alarm);
+            initDateTimeLayout();
         } else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
             setContentView(R.layout.activity_add_countdown_alarm);
             initConditionLayout();
@@ -144,8 +178,21 @@ public class AddAlarmActivity extends AppCompatActivity {
                 saveAfter = mCheckSave.isChecked();
             }
 
+            else if (layoutFlag == LAYOUT_ADD_DATETIME_ALARM) {
+                Date dtGoal = getDateTimeTriggerTime(triggerDate, triggerTime);
+                alarmTriggerTime = dtGoal.getTime() - c.getTimeInMillis();
+
+                if (alarmTriggerTime < 0) {
+                    Snackbar.make(mView, "Invalid time.  Please try a different time.",
+                            Snackbar.LENGTH_LONG).show();
+                    return false;
+                }
+
+                saveAfter = false;
+            }
+
             else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
-                alarmTriggerTime = getTriggerTime();
+                alarmTriggerTime = getConditionTriggerTime();
                 saveAfter = mCheckSave.isChecked();
             }
 
@@ -219,6 +266,24 @@ public class AddAlarmActivity extends AppCompatActivity {
         mGoalPicker.setSelectedItem(max);
     }
 
+    private void initDateTimeLayout() {
+        mSetDateButton = (Button) findViewById(R.id.btn_set_date);
+        mSetTimeButton = (Button) findViewById(R.id.btn_set_time);
+
+        mCurrentDate = (TextView) findViewById(R.id.txt_current_date);
+        mCurrentTime = (TextView) findViewById(R.id.txt_current_time);
+
+        mSetDateButton.setOnClickListener(mDateTimeClickListener);
+        mSetTimeButton.setOnClickListener(mDateTimeClickListener);
+
+        Date today = c.getTime();
+        triggerDate = sdfDate.format(today);
+        triggerTime = sdfTime.format(today);
+
+        mCurrentDate.setText(triggerDate);
+        mCurrentTime.setText(triggerTime);
+    }
+
     private void initConditionLayout() {
         mDay = (TextView) findViewById(R.id.input_day);
         mHour = (TextView) findViewById(R.id.input_hour);
@@ -236,16 +301,16 @@ public class AddAlarmActivity extends AppCompatActivity {
         mNine = (Button) findViewById(R.id.nine);
         mZero = (Button) findViewById(R.id.zero);
 
-        mOne.setOnClickListener(mButtonClickListener);
-        mTwo.setOnClickListener(mButtonClickListener);
-        mThree.setOnClickListener(mButtonClickListener);
-        mFour.setOnClickListener(mButtonClickListener);
-        mFive.setOnClickListener(mButtonClickListener);
-        mSix.setOnClickListener(mButtonClickListener);
-        mSeven.setOnClickListener(mButtonClickListener);
-        mEight.setOnClickListener(mButtonClickListener);
-        mNine.setOnClickListener(mButtonClickListener);
-        mZero.setOnClickListener(mButtonClickListener);
+        mOne.setOnClickListener(mConditionClickListener);
+        mTwo.setOnClickListener(mConditionClickListener);
+        mThree.setOnClickListener(mConditionClickListener);
+        mFour.setOnClickListener(mConditionClickListener);
+        mFive.setOnClickListener(mConditionClickListener);
+        mSix.setOnClickListener(mConditionClickListener);
+        mSeven.setOnClickListener(mConditionClickListener);
+        mEight.setOnClickListener(mConditionClickListener);
+        mNine.setOnClickListener(mConditionClickListener);
+        mZero.setOnClickListener(mConditionClickListener);
     }
 
     // Check if the EditText field is empty
@@ -265,7 +330,49 @@ public class AddAlarmActivity extends AppCompatActivity {
         return str;
     }
 
-    private long getTriggerTime() {
+    private String formatTime(int hourOfDay, int minute) {
+        String formatted;
+        String min;
+        String am = " AM";
+        String pm = " PM";
+
+        if (minute < 10) {
+            min = "0" + minute;
+        } else {
+            min = String.valueOf(minute);
+        }
+
+        if (hourOfDay == 0) {
+            formatted = 12 + ":" + min + am;
+        } else if (hourOfDay < 10) {
+            formatted = "0" + hourOfDay + ":" + min + am;
+        } else if (hourOfDay < 12) {
+            formatted = hourOfDay + ":" + min + am;
+        } else if (hourOfDay == 12) {
+            formatted = hourOfDay + ":" + min + pm;
+        } else {
+            formatted = "0" + (hourOfDay - 12) + ":" + min + pm;
+        }
+
+        return formatted;
+    }
+
+    private Date getDateTimeTriggerTime(String date, String time) {
+        Date goal = c.getTime();
+
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault());
+        String dateTime = date + " " + time;
+
+        try {
+            goal = format.parse(dateTime);
+        } catch (ParseException e) {
+            e.getMessage();
+        }
+
+        return goal;
+    }
+
+    private long getConditionTriggerTime() {
         return  (Integer.parseInt(removeLeadingZero(day)) * 24 * 60 * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(hour)) * 60 * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(minute)) * 60 * 1000)
@@ -281,7 +388,76 @@ public class AddAlarmActivity extends AppCompatActivity {
 
     /** Listeners */
 
-    private View.OnClickListener mButtonClickListener = new View.OnClickListener() {
+    private View.OnClickListener mDateTimeClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Context context = v.getContext();
+
+            switch(v.getId()) {
+                case R.id.btn_set_date:
+                    dtYear = c.get(Calendar.YEAR);
+                    dtMonth = c.get(Calendar.MONTH);
+                    dtDay = c.get(Calendar.DAY_OF_MONTH);
+
+                    DatePickerDialog dp = new DatePickerDialog(context,
+                            new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePicker view,
+                                                      int year, int monthOfYear, int dayOfMonth) {
+                                    triggerDate = (monthOfYear + 1) + "/" + dayOfMonth + "/" + year;
+
+                                    SimpleDateFormat parseFormat = new SimpleDateFormat(
+                                            "MM/dd/yyyy", Locale.getDefault());
+
+                                    Date d = c.getTime();
+
+                                    try {
+                                        d = parseFormat.parse(triggerDate);
+                                    } catch (ParseException e) {
+                                        e.getMessage();
+                                    }
+
+                                    mCurrentDate.setText(sdfDate.format(d));
+                                }
+                            }, dtYear, dtMonth, dtDay);
+
+                    dp.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                    dp.setTitle("");
+                    dp.setCancelable(false);
+
+                    dp.show();
+                    break;
+
+                case R.id.btn_set_time:
+                    dtHour = c.get(Calendar.HOUR_OF_DAY);
+                    dtMinute = c.get(Calendar.MINUTE);
+
+                    TimePickerDialog tp = new TimePickerDialog(context,
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    triggerTime = hourOfDay + ":" + minute;
+
+                                    if (hourOfDay < 12) {
+                                        triggerTime += " AM";
+                                    } else {
+                                        triggerTime += " PM";
+                                    }
+
+                                    String formatted = formatTime(hourOfDay, minute);
+                                    mCurrentTime.setText(formatted);
+                                }
+                            }, dtHour, dtMinute, false);
+
+                    tp.setCancelable(false);
+
+                    tp.show();
+                    break;
+            }
+        }
+    };
+
+    private View.OnClickListener mConditionClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             char input = '0';

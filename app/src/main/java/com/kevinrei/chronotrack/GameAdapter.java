@@ -170,12 +170,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
                 case R.id.card_create:
                     if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
-                        showCreateAlarmDialog(v, game);
+                        showAlarmDialogWithStamina(v, game);
                     } else {
-                        Intent alarmIntent = new Intent(context, AddAlarmActivity.class);
-                        alarmIntent.putExtra("flag", 1);
-                        alarmIntent.putExtra("game", game);
-                        ((MainActivity) context).startActivityForResult(alarmIntent, ADD_NEW_ALARM);
+                        showAlarmDialogWithoutStamina(v, game);
                     }
                     break;
 
@@ -198,8 +195,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
     /** Alert Dialogs */
 
-    private void showCreateAlarmDialog(final View v, final Game game) {
-        CharSequence[] options = new CharSequence[] { "Stamina Alarm", "Countdown Alarm" };
+    private void showAlarmDialogWithStamina(final View v, final Game game) {
+        CharSequence[] options = new CharSequence[] { "Stamina", "Date & Time", "Countdown" };
 
         final Context context = v.getContext();
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
@@ -212,6 +209,35 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             public void onClick(DialogInterface dialog, int which) {
                 Intent i = new Intent(context, AddAlarmActivity.class);
                 i.putExtra("flag", which);
+                i.putExtra("game", game);
+                ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
+            }
+        });
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mBuilder.show();
+    }
+
+    private void showAlarmDialogWithoutStamina(final View v, final Game game) {
+        CharSequence[] options = new CharSequence[] { "Date & Time", "Countdown" };
+
+        final Context context = v.getContext();
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+
+        mBuilder.setTitle("Select Alarm Type");
+        mBuilder.setCancelable(false);
+
+        mBuilder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(context, AddAlarmActivity.class);
+                i.putExtra("flag", which + 1);
                 i.putExtra("game", game);
                 ((MainActivity) context).startActivityForResult(i, ADD_NEW_ALARM);
             }
