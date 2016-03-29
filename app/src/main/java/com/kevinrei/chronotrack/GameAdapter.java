@@ -170,9 +170,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
                 case R.id.card_create:
                     if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
-                        showAlarmDialogWithStamina(v, game);
+                        showAlarmDialogWithStamina(context, game);
                     } else {
-                        showAlarmDialogWithoutStamina(v, game);
+                        showAlarmDialogWithoutStamina(context, game);
                     }
                     break;
 
@@ -195,12 +195,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
     /** Alert Dialogs */
 
-    private void showAlarmDialogWithStamina(final View v, final Game game) {
+    private void showAlarmDialogWithStamina(final Context context, final Game game) {
         CharSequence[] options = new CharSequence[] { "Stamina", "Date & Time", "Countdown" };
 
-        final Context context = v.getContext();
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
-
         mBuilder.setTitle("Select Alarm Type");
         mBuilder.setCancelable(false);
 
@@ -224,12 +222,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         mBuilder.show();
     }
 
-    private void showAlarmDialogWithoutStamina(final View v, final Game game) {
+    private void showAlarmDialogWithoutStamina(final Context context, final Game game) {
         CharSequence[] options = new CharSequence[] { "Date & Time", "Countdown" };
 
-        final Context context = v.getContext();
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
-
         mBuilder.setTitle("Select Alarm Type");
         mBuilder.setCancelable(false);
 

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:elevation="0dp">
+        app:elevation="4dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -36,49 +36,6 @@
         style="@style/Margin" >
 
         <!-- Layout for condition alarms -->
-
-<!--        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            style="@style/Padding">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/condition_text"
-                android:textStyle="italic"
-                android:textColor="@color/textPrimary"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <LinearLayout
-                android:id="@+id/layout_countdown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_small"
-                android:gravity="center"
-                android:orientation="horizontal" >
-
-                <Button
-                    android:id="@+id/btn_set_reminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/remind_me"/>
-
-                <TextView
-                    android:id="@+id/current_reminder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_small"
-                    android:layout_marginStart="@dimen/margin_small"
-                    android:text="@string/default_reminder"
-                    android:textColor="@color/textPrimary"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            </LinearLayout>
-
-        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"

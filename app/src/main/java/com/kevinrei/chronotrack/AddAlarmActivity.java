@@ -145,7 +145,7 @@ public class AddAlarmActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_item, menu);
+        getMenuInflater().inflate(R.menu.menu_new_alarm, menu);
         return true;
     }
 
@@ -159,13 +159,13 @@ public class AddAlarmActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
-        } else if (id == R.id.action_save) {
+        } else if (id == R.id.action_start) {
             int uniqueAlarmID = (int) (System.currentTimeMillis() / 100000);
             int gameId = game.getId();
             int current = 0;
             int goal = 0;
-            long alarmTriggerTime = -1;      // When the alarm should be triggered
-            String alarmLabel;               // The alarm's label
+            long alarmTriggerTime = -1;     // When the alarm should be triggered
+            String alarmLabel;              // The alarm's label
             boolean saveAfter = false;      // Delete the alarm after it's been triggered
 
             Log.d("layout", String.valueOf(layoutFlag));
@@ -173,6 +173,12 @@ public class AddAlarmActivity extends AppCompatActivity {
             if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
                 current = mCurrentPicker.getSelectedItem();
                 goal = mGoalPicker.getSelectedItem();
+
+                if ((goal - current) <= 0) {
+                    Snackbar.make(mView, "Invalid entry.  Please try different values.",
+                            Snackbar.LENGTH_LONG).show();
+                    return false;
+                }
 
                 alarmTriggerTime = game.getRecoveryRate() * (goal - current) * 1000;
                 saveAfter = mCheckSave.isChecked();
@@ -220,6 +226,9 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             // Add the alarm to the database
             db.addAlarm(alarm);
+
+            // Notify the alarm adapter
+            notifyAlarmAdapter(alarm);
 
             // Trigger a new PendingIntent
             context = AddAlarmActivity.this;
@@ -377,6 +386,14 @@ public class AddAlarmActivity extends AppCompatActivity {
                 + (Integer.parseInt(removeLeadingZero(hour)) * 60 * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(minute)) * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(second)) * 1000);
+    }
+
+    public void notifyAlarmAdapter(Alarm alarm) {
+        int position = AlarmAdapter.alarms.size();
+
+        AlarmAdapter.alarms.add(position, alarm);
+        AlarmListFragment.mAlarmAdapter.notifyItemInserted(position);
+        AlarmListFragment.mAlarmAdapter.notifyItemRangeChanged(0, position);
     }
 
     public static void cancelAlarm(int alarmId) {
