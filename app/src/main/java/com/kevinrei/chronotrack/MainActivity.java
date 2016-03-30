@@ -1,10 +1,15 @@
 package com.kevinrei.chronotrack;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.design.internal.NavigationMenu;
+import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -12,12 +17,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import io.github.yavski.fabspeeddial.FabSpeedDial;
-import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +47,34 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
+    /** Floating Action Button */
+    private int fabPosition = 0;
+
+    /** Game Dialog */
+    public static class Action {
+        public final int icon;
+        public final String action;
+        public Action(Integer icon, String action) {
+            this.icon = icon;
+            this.action = action;
+        }
+
+        @Override
+        public String toString() {
+            return action;
+        }
+    }
+
+    /** Alarm Dialog */
+    MySQLiteHelper db;
+    List<Game> games;
+    List<Boolean> isStamina;
+
+    ExpandableListAdapter mExpandAdapter;
+    ExpandableListView mExpandView;
+    List<String> gameTitles;
+    HashMap<String, List<String>> alarmOptions;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,36 +85,34 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        db = new MySQLiteHelper(this);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // Fab speed dial with options to add from installed apps or add a new game
-        final FabSpeedDial fabSpeedDial = (FabSpeedDial) findViewById(R.id.fab_speed_dial);
-        fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onPrepareMenu(NavigationMenu navigationMenu) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemSelected(MenuItem item) {
-                int id = item.getItemId();
-
-                if (id == R.id.action_add_installed) {
-                    Intent selectInstalledIntent = new Intent(MainActivity.this, InstalledAppActivity.class);
-                    startActivityForResult(selectInstalledIntent, SELECT_INSTALLED_APP);
-                    return true;
+            public void onClick(View v) {
+                if (fabPosition == 0) {
+                    showGameTypeDialog();
                 }
 
-                else if (id == R.id.action_add_uninstalled) {
-                    Intent newGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
-                    startActivityForResult(newGameIntent, ADD_NEW_GAME);
-                    return true;
+                else if (fabPosition == 1) {
+                    games = db.getAllGames();
+
+                    if (!games.isEmpty()) {
+                        showGameListDialog();
+                    } else {
+                        Snackbar.make(view, "Please add a game first.", Snackbar.LENGTH_LONG);
+                    }
                 }
 
-                return false;
+                else if (fabPosition == 2) {
+
+                }
             }
         });
 
@@ -85,11 +127,17 @@ public class MainActivity extends AppCompatActivity {
                         super.onTabSelected(tab);
 
                         if (tab.getPosition() == 0) {
-                            fabSpeedDial.setVisibility(View.VISIBLE);
-                        }
-
-                        else {
-                            fabSpeedDial.setVisibility(View.GONE);
+                            fabPosition = 0;
+                            fab.setImageDrawable(getResources()
+                                    .getDrawable(R.drawable.ic_add));
+                        } else if (tab.getPosition() == 1) {
+                            fabPosition = 1;
+                            fab.setImageDrawable(getResources()
+                                    .getDrawable(R.drawable.ic_add_alarm));
+                        } else if (tab.getPosition() == 2) {
+                            fabPosition = 2;
+                            fab.setImageDrawable(getResources()
+                                    .getDrawable(R.drawable.ic_play_arrow));
                         }
                     }
         });
@@ -152,9 +200,238 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * FragmentStatePagerAdapter
-     * */
+    /** Custom methods */
+
+    private void prepareTitles() {
+        gameTitles = new ArrayList<>();
+        alarmOptions = new HashMap<>();
+        isStamina = new ArrayList<>();
+
+        for (Game game : games) {
+            List<String> options = new ArrayList<>();
+            gameTitles.add(game.getTitle());
+
+            if (game.getCategory().equals("Mobile game") && game.getRecoveryRate() != 0) {
+                options.add("Stamina");
+                options.add("Date & Time");
+                options.add("Condition");
+                isStamina.add(true);
+            } else {
+                options.add("Date & Time");
+                options.add("Condition");
+                isStamina.add(false);
+            }
+
+            alarmOptions.put(game.getTitle(), options);
+        }
+    }
+
+
+    /** Alert Dialogs */
+
+    private void showGameTypeDialog() {
+        final Action[] actions = {
+                new Action(R.drawable.ic_phone_android, "Installed App"),
+                new Action(R.drawable.ic_gamepad, "Other Games")
+        };
+
+        TypedArray typedArray = this.obtainStyledAttributes(null,
+                R.styleable.AlertDialog, R.attr.alertDialogStyle, 0);
+
+        ListAdapter adapter = new ArrayAdapter<Action>(this,
+                typedArray.getResourceId(R.styleable.AlertDialog_listItemLayout, 0),
+                android.R.id.text1, actions){
+            public View getView(int position, View convertView, ViewGroup parent) {
+                //Use super class to create the View
+                View v = super.getView(position, convertView, parent);
+                TextView tv = (TextView) v.findViewById(android.R.id.text1);
+
+                //Put the image on the TextView
+                tv.setCompoundDrawablesWithIntrinsicBounds(actions[position].icon, 0, 0, 0);
+
+                //Add margin between image and text (support various screen densities)
+                int dp8 = (int) (8 * v.getContext().getResources().getDisplayMetrics().density);
+                tv.setCompoundDrawablePadding(dp8);
+
+                return v;
+            }
+        };
+
+        typedArray.recycle();
+
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle("Select Game Type");
+        mBuilder.setCancelable(false);
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        mBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    Intent selectInstalledIntent = new Intent(MainActivity.this, InstalledAppActivity.class);
+                    startActivityForResult(selectInstalledIntent, SELECT_INSTALLED_APP);
+                }
+
+                else {
+                    Intent newGameIntent = new Intent(MainActivity.this, NewGameActivity.class);
+                    startActivityForResult(newGameIntent, ADD_NEW_GAME);
+                }
+            }
+        });
+
+        mBuilder.show();
+    }
+
+    private void showGameListDialog() {
+        prepareTitles();
+
+        mExpandAdapter = new ExpandableListAdapter(this, gameTitles, alarmOptions);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        View view = this.getLayoutInflater().inflate(R.layout.dialog_select_game, null);
+        mBuilder.setView(view);
+
+        mExpandView = (ExpandableListView) view.findViewById(R.id.expandable_menu);
+        mExpandView.setAdapter(mExpandAdapter);
+
+        mBuilder.setTitle("Select Game");
+        mBuilder.setCancelable(false);
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog mAlert = mBuilder.create();
+
+        // Listview on child click listener
+        mExpandView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                int flag;
+                if (isStamina.get(groupPosition)) {
+                    flag = childPosition;
+                } else {
+                    flag = childPosition + 1;
+                }
+
+                Intent i = new Intent(MainActivity.this, AddAlarmActivity.class);
+                i.putExtra("flag", flag);
+                i.putExtra("game", games.get(groupPosition));
+                startActivityForResult(i, ADD_NEW_ALARM);
+
+                mAlert.dismiss();
+                return true;
+            }
+        });
+
+        mAlert.show();
+    }
+
+
+    /** Adapters */
+
+    public class ExpandableListAdapter extends BaseExpandableListAdapter {
+        private Context context;
+        private List<String> titles;
+        private HashMap<String, List<String>> options;
+
+        public ExpandableListAdapter(Context context, List<String> titles,
+                                     HashMap<String, List<String>> options) {
+            this.context = context;
+            this.titles = titles;
+            this.options = options;
+        }
+
+        @Override
+        public Object getChild(int listPosition, int expandedListPosition) {
+            return this.options.get(this.titles.get(listPosition))
+                    .get(expandedListPosition);
+        }
+
+        @Override
+        public long getChildId(int listPosition, int expandedListPosition) {
+            return expandedListPosition;
+        }
+
+        @Override
+        public View getChildView(int listPosition, final int expandedListPosition,
+                                 boolean isLastChild, View convertView, ViewGroup parent) {
+            final String expandedListText = (String) getChild(listPosition, expandedListPosition);
+            if (convertView == null) {
+                LayoutInflater layoutInflater = (LayoutInflater) this.context
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = layoutInflater.inflate(R.layout.list_option, null);
+            }
+            TextView expandedListTextView = (TextView) convertView
+                    .findViewById(R.id.list_option);
+            expandedListTextView.setText(expandedListText);
+            return convertView;
+        }
+
+        @Override
+        public int getChildrenCount(int listPosition) {
+            return this.options.get(this.titles.get(listPosition))
+                    .size();
+        }
+
+        @Override
+        public Object getGroup(int listPosition) {
+            return this.titles.get(listPosition);
+        }
+
+        @Override
+        public int getGroupCount() {
+            return this.titles.size();
+        }
+
+        @Override
+        public long getGroupId(int listPosition) {
+            return listPosition;
+        }
+
+        @Override
+        public View getGroupView(int listPosition, boolean isExpanded,
+                                 View convertView, ViewGroup parent) {
+            String listTitle = (String) getGroup(listPosition);
+
+            if (convertView == null) {
+                LayoutInflater layoutInflater = (LayoutInflater) this.context.
+                        getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = layoutInflater.inflate(R.layout.list_title, null);
+            }
+
+            TextView listTitleTextView = (TextView) convertView
+                    .findViewById(R.id.list_title);
+            listTitleTextView.setTypeface(null, Typeface.BOLD);
+            listTitleTextView.setText(listTitle);
+
+            if (isExpanded) {
+
+            }
+
+            return convertView;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public boolean isChildSelectable(int listPosition, int expandedListPosition) {
+            return true;
+        }
+    }
+
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -189,13 +466,14 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
+                    // List of games
                     return "Games";
                 case 1:
-                    // Countdown: remind me in x time
-                    return "Alarms";
+                    // Active alarms
+                    return "Active";
                 case 2:
-                    // Condition: remind me when x time reached
-                    return "Timer";
+                    // Quick timer
+                    return "Quick";
             }
             return null;
         }
