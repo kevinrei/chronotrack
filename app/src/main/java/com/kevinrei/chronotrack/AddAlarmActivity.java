@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -86,6 +87,8 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected Button mEight;
     protected Button mNine;
     protected Button mZero;
+    protected ImageButton mClear;
+    protected ImageButton mBack;
 
     int position = 7;
     String day;
@@ -310,6 +313,9 @@ public class AddAlarmActivity extends AppCompatActivity {
         mNine = (Button) findViewById(R.id.nine);
         mZero = (Button) findViewById(R.id.zero);
 
+        mClear = (ImageButton) findViewById(R.id.img_btn_clear);
+        mBack = (ImageButton) findViewById(R.id.img_btn_back);
+
         mOne.setOnClickListener(mConditionClickListener);
         mTwo.setOnClickListener(mConditionClickListener);
         mThree.setOnClickListener(mConditionClickListener);
@@ -320,6 +326,9 @@ public class AddAlarmActivity extends AppCompatActivity {
         mEight.setOnClickListener(mConditionClickListener);
         mNine.setOnClickListener(mConditionClickListener);
         mZero.setOnClickListener(mConditionClickListener);
+
+        mClear.setOnClickListener(mDeleteClickListener);
+        mBack.setOnClickListener(mDeleteClickListener);
     }
 
     // Check if the EditText field is empty
@@ -379,6 +388,18 @@ public class AddAlarmActivity extends AppCompatActivity {
         }
 
         return goal;
+    }
+
+    private void setCondition(String t) {
+        day = t.substring(0, 2);
+        hour = t.substring(2, 4);
+        minute = t.substring(4, 6);
+        second = t.substring(6, 8);
+
+        mDay.setText(day);
+        mHour.setText(hour);
+        mMinute.setText(minute);
+        mSecond.setText(second);
     }
 
     private long getConditionTriggerTime() {
@@ -537,20 +558,55 @@ public class AddAlarmActivity extends AppCompatActivity {
                 }
 
                 time.setCharAt(7, input);
-                position--;
+                if (position != 0) {
+                    position--;
+                }
             }
 
-            String t = time.toString();
+            setCondition(time.toString());
+        }
+    };
 
-            day = t.substring(0, 2);
-            hour = t.substring(2, 4);
-            minute = t.substring(4, 6);
-            second = t.substring(6, 8);
+    private View.OnClickListener mDeleteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
-            mDay.setText(day);
-            mHour.setText(hour);
-            mMinute.setText(minute);
-            mSecond.setText(second);
+            switch(v.getId()) {
+                case R.id.img_btn_clear:
+                    String reset = "00";
+
+                    mDay.setText(reset);
+                    mHour.setText(reset);
+                    mMinute.setText(reset);
+                    mSecond.setText(reset);
+
+                    position = 7;
+                    break;
+
+                case R.id.img_btn_back:
+                    char del = '0';
+
+                    String secondText = mSecond.getText().toString();
+                    String minuteText = mMinute.getText().toString();
+                    String hourText = mHour.getText().toString();
+                    String dayText = mDay.getText().toString();
+
+                    String join = dayText + hourText + minuteText + secondText;
+                    StringBuilder time = new StringBuilder(join);
+                    if (position == 7) {
+                        time.setCharAt(7, del);
+                    } else if (position >= 0) {
+                        for (int p = position; p < 7; p++) {
+                            time.setCharAt(p + 1, join.charAt(p));
+                        }
+
+                        time.setCharAt(position, del);
+                        position++;
+                    }
+
+                    setCondition(time.toString());
+                    break;
+            }
         }
     };
 }

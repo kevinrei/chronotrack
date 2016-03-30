@@ -75,6 +75,8 @@
     <string name="eight">8</string>
     <string name="nine">9</string>
     <string name="zero">0</string>
+    <string name="clear">Clear</string>
+    <string name="delete">Back</string>
 
     <string name="alarm_label">Label</string>
     <string name="check_save">Save this alarm</string>
