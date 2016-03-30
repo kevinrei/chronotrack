@@ -289,23 +289,25 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 null,                                       // order by
                 null);                                      // limit
 
-        // If the results are retrieved, get the first one
-        if (cursor != null) { cursor.moveToFirst(); }
-
-        // Build the Alarm object
         Alarm alarm = new Alarm();
-        alarm.setId(Integer.parseInt(cursor.getString(0)));
-        alarm.setAlarmId(Integer.parseInt(cursor.getString(1)));
-        alarm.setGameId(Integer.parseInt(cursor.getString(2)));
-        alarm.setFlag(Integer.parseInt(cursor.getString(3)));
-        alarm.setStart(Integer.parseInt(cursor.getString(4)));
-        alarm.setEnd(Integer.parseInt(cursor.getString(5)));
-        alarm.setTrigger(Long.parseLong(cursor.getString(6)));
-        alarm.setCountdown(Long.parseLong(cursor.getString(7)));
-        alarm.setLabel(cursor.getString(8));
-        alarm.setSave(Integer.parseInt(cursor.getString(9)));
 
-        cursor.close();
+        // If the results are retrieved, get the first one
+        if (cursor != null && cursor.moveToFirst()) {
+
+            // Build the Alarm object
+            alarm.setId(Integer.parseInt(cursor.getString(0)));
+            alarm.setAlarmId(Integer.parseInt(cursor.getString(1)));
+            alarm.setGameId(Integer.parseInt(cursor.getString(2)));
+            alarm.setFlag(Integer.parseInt(cursor.getString(3)));
+            alarm.setStart(Integer.parseInt(cursor.getString(4)));
+            alarm.setEnd(Integer.parseInt(cursor.getString(5)));
+            alarm.setTrigger(Long.parseLong(cursor.getString(6)));
+            alarm.setCountdown(Long.parseLong(cursor.getString(7)));
+            alarm.setLabel(cursor.getString(8));
+            alarm.setSave(Integer.parseInt(cursor.getString(9)));
+
+            cursor.close();
+        }
 
         db.close();
 

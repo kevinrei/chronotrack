@@ -49,23 +49,31 @@ public class AlarmService extends Service {
             save = intent.getIntExtra("save", 0);
         }
 
-        final Alarm alarm = db.getAlarm(alarmId);
+        Log.d("alarmId", String.valueOf(alarmId));
+        Log.d("save", String.valueOf(save));
 
         mBuilder.setContentTitle("ChronoTrack");
-        mBuilder.setContentText(alarm.getLabel());
+        mBuilder.setContentText("Ready to rumble!!");
         mBuilder.setTicker("Stamina notification");
         mBuilder.setSmallIcon(R.mipmap.ic_launcher);
         mBuilder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
         mBuilder.setSound(uri);
         mBuilder.setLights(Color.BLUE, 3000, 3000);
 
-        // Cancel alarm, just to be safe
-        AddAlarmActivity.cancelAlarm(alarm.getAlarmId());
+/*        if (alarmId != -1) {
+            final Alarm alarm = db.getAlarm(alarmId);
 
-        // Alarm isn't saved, so delete it
-        if (save == 0) {
-            deleteAlarmFromDatabase(alarm);
-        }
+            // Cancel alarm, just to be safe
+            AddAlarmActivity.cancelAlarm(alarm.getAlarmId());
+
+            // Remove alarm from active list
+            removeFromActiveList(alarm);
+
+            // Alarm isn't saved, so delete it
+            if (save == 0) {
+                db.deleteAlarm(alarm);
+            }
+        }*/
 
         Intent resultIntent = new Intent(this.getApplicationContext(), MainActivity.class);
 
@@ -86,7 +94,7 @@ public class AlarmService extends Service {
 
     /** Custom methods */
 
-    private void deleteAlarmFromDatabase(final Alarm alarm) {
+    private void removeFromActiveList(final Alarm alarm) {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -103,8 +111,6 @@ public class AlarmService extends Service {
                 AlarmAdapter.alarms.remove(position);
                 AlarmListFragment.mAlarmAdapter.notifyItemRemoved(position);
                 AlarmListFragment.mAlarmAdapter.notifyItemRangeChanged(0, AlarmAdapter.alarms.size());
-
-                db.deleteAlarm(alarm);
             }
         }, 5000);
     }

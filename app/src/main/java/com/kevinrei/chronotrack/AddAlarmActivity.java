@@ -163,7 +163,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (id == R.id.action_start) {
-            int uniqueAlarmID = (int) (System.currentTimeMillis() / 100000);
+            int uniqueAlarmID = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
             int gameId = game.getId();
             int current = 0;
             int goal = 0;
