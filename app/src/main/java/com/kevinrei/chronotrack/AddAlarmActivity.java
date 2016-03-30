@@ -236,6 +236,8 @@ public class AddAlarmActivity extends AppCompatActivity {
             // Trigger a new PendingIntent
             context = AddAlarmActivity.this;
             notifyIntent = new Intent(this, AlarmReceiver.class);
+            notifyIntent.putExtra("alarm_id", uniqueAlarmID);
+            notifyIntent.putExtra("save", saveAfterFlag);
             mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAlarmId(), notifyIntent, 0);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP,
                     startCountdownValue,

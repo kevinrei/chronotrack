@@ -84,19 +84,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         viewHolder.mTriggerTime.setText(triggerTime);
 
         // Time remaining until alarm is fired
-        CountDownTimer mCountdown = new CountDownTimer(alarm.getTrigger(), 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                viewHolder.mTimeLeft.setText(getAlarmTriggerTime(millisUntilFinished));
-            }
-
-            @Override
-            public void onFinish() {
-                String complete = "Alarm triggered!";
-                viewHolder.mTimeLeft.setText(complete);
-            }
-        };
-        mCountdown.start();
+        Countdown mCountdown = new Countdown(viewHolder.mTimeLeft);
+        mCountdown.updateTextAndProgress(alarm);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

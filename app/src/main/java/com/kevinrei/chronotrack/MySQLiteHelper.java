@@ -275,19 +275,19 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Get the details of an alarm
-    public Alarm getAlarm(int aid) {
+    public Alarm getAlarm(int alarmId) {
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Build the query
-        Cursor cursor = db.query(TABLE_ALARMS,          // table
-                COLUMNS_ALARMS,                         // column names
-                " aid = ?",                             // selections
-                new String[] { String.valueOf(aid) },   // selection arguments
-                null,                                   // group by
-                null,                                   // having
-                null,                                   // order by
-                null);                                  // limit
+        Cursor cursor = db.query(TABLE_ALARMS,              // table
+                COLUMNS_ALARMS,                             // column names
+                " alarmId = ?",                             // selections
+                new String[] { String.valueOf(alarmId) },   // selection arguments
+                null,                                       // group by
+                null,                                       // having
+                null,                                       // order by
+                null);                                      // limit
 
         // If the results are retrieved, get the first one
         if (cursor != null) { cursor.moveToFirst(); }
