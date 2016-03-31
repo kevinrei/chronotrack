@@ -108,7 +108,7 @@ public class AddAlarmActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         layoutFlag = i.getIntExtra("flag", 2);
-        game = (Game) i.getSerializableExtra("game");
+        game = i.getParcelableExtra("game");
 
         if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
             setContentView(R.layout.activity_add_stamina_alarm);
@@ -236,7 +236,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             // Trigger a new PendingIntent
             context = AddAlarmActivity.this;
             notifyIntent = new Intent(this, AlarmReceiver.class);
-            notifyIntent.putExtra("alarm_id", uniqueAlarmID);
+            notifyIntent.putExtra("alarm", alarm);
             notifyIntent.putExtra("save", saveAfterFlag);
             mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAlarmId(), notifyIntent, 0);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP,
@@ -423,6 +423,7 @@ public class AddAlarmActivity extends AppCompatActivity {
         if (mAlarmManager != null) {
             PendingIntent cancelIntent = PendingIntent.getBroadcast(context, alarmId, notifyIntent, 0);
             mAlarmManager.cancel(cancelIntent);
+            cancelIntent.cancel();
         }
     }
 

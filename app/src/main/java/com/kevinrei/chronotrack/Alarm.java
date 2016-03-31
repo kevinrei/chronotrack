@@ -100,6 +100,28 @@ public class Alarm implements Parcelable {
         this.save = save;
     }
 
+    public int getId() { return id; }
+    public int getAlarmId() { return alarmId; }
+    public int getGameId() { return gameId; }
+    public int getFlag() { return flag; }
+    public int getStart() { return start; }
+    public int getEnd() { return end; }
+    public long getTrigger() { return trigger; }
+    public long getCountdown() { return countdown; }
+    public String getLabel() { return label; }
+    public int getSave() { return save; }
+
+    public void setId(int id) { this.id = id; }
+    public void setAlarmId(int alarmId) { this.alarmId = alarmId; }
+    public void setGameId(int gameId) { this.gameId = gameId; }
+    public void setFlag(int flag) { this.flag = flag; }
+    public void setStart(int start) { this.start = start; }
+    public void setEnd(int end) { this.end = end; }
+    public void setTrigger(long trigger) { this.trigger = trigger; }
+    public void setCountdown(long countdown) { this.countdown = countdown; }
+    public void setLabel(String label) { this.label = label; }
+    public void setSave(int save) { this.save = save; }
+
     public Alarm(Parcel source) {
         id = source.readInt();
         alarmId = source.readInt();
@@ -143,26 +165,4 @@ public class Alarm implements Parcelable {
             return new Alarm(source);
         }
     };
-
-    public int getId() { return id; }
-    public int getAlarmId() { return alarmId; }
-    public int getGameId() { return gameId; }
-    public int getFlag() { return flag; }
-    public int getStart() { return start; }
-    public int getEnd() { return end; }
-    public long getTrigger() { return trigger; }
-    public long getCountdown() { return countdown; }
-    public String getLabel() { return label; }
-    public int getSave() { return save; }
-
-    public void setId(int id) { this.id = id; }
-    public void setAlarmId(int alarmId) { this.alarmId = alarmId; }
-    public void setGameId(int gameId) { this.gameId = gameId; }
-    public void setFlag(int flag) { this.flag = flag; }
-    public void setStart(int start) { this.start = start; }
-    public void setEnd(int end) { this.end = end; }
-    public void setTrigger(long trigger) { this.trigger = trigger; }
-    public void setCountdown(long countdown) { this.countdown = countdown; }
-    public void setLabel(String label) { this.label = label; }
-    public void setSave(int save) { this.save = save; }
 }

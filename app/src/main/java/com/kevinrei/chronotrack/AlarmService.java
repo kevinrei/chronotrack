@@ -41,15 +41,19 @@ public class AlarmService extends Service {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
 
         db = new MySQLiteHelper(this);
-        int alarmId = -1;
-        int save = 0;
+        Alarm alarm = null;
+        int save = -1;
 
         if (intent != null) {
-            alarmId = intent.getIntExtra("alarm_id", 0);
+            alarm = intent.getParcelableExtra("alarm");
             save = intent.getIntExtra("save", 0);
         }
 
-        Log.d("alarmId", String.valueOf(alarmId));
+        if (alarm != null) {
+            Log.d("alarmId", String.valueOf(alarm.getAlarmId()));
+        } else {
+            Log.d("alarmId", "Alarm is null");
+        }
         Log.d("save", String.valueOf(save));
 
         mBuilder.setContentTitle("ChronoTrack");
