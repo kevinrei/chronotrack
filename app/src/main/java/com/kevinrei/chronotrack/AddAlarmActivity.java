@@ -97,8 +97,6 @@ public class AddAlarmActivity extends AppCompatActivity {
     String second;
 
     /** Alarm variables */
-    public static AlarmManager mAlarmManager;
-    public static PendingIntent mPendingIntent;
     public static Context context;
     public static Intent notifyIntent;
 
@@ -108,7 +106,7 @@ public class AddAlarmActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         layoutFlag = i.getIntExtra("flag", 2);
-        game = i.getParcelableExtra("game");
+        game = (Game) i.getSerializableExtra("game");
 
         if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
             setContentView(R.layout.activity_add_stamina_alarm);
@@ -140,8 +138,6 @@ public class AddAlarmActivity extends AppCompatActivity {
         }
 
         mCheckSave = (CheckBox) findViewById(R.id.cb_save);
-        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
         Log.d("layout_flag", String.valueOf(layoutFlag));
     }
 
@@ -233,15 +229,9 @@ public class AddAlarmActivity extends AppCompatActivity {
             // Notify the alarm adapter
             notifyAlarmAdapter(alarm);
 
-            // Trigger a new PendingIntent
-            context = AddAlarmActivity.this;
-            notifyIntent = new Intent(this, AlarmReceiver.class);
-            notifyIntent.putExtra("alarm", alarm);
-            notifyIntent.putExtra("save", saveAfterFlag);
-            mPendingIntent = PendingIntent.getBroadcast(context, alarm.getAlarmId(), notifyIntent, 0);
-            mAlarmManager.set(AlarmManager.RTC_WAKEUP,
-                    startCountdownValue,
-                    mPendingIntent);
+            // Create the alarm
+            AlarmController controller = new AlarmController();
+            controller.setAlarm(this, alarm);
 
             // Pass the result to MainActivity
             Intent i = new Intent();
@@ -417,14 +407,6 @@ public class AddAlarmActivity extends AppCompatActivity {
         AlarmAdapter.alarms.add(position, alarm);
         AlarmListFragment.mAlarmAdapter.notifyItemInserted(position);
         AlarmListFragment.mAlarmAdapter.notifyItemRangeChanged(0, position);
-    }
-
-    public static void cancelAlarm(int alarmId) {
-        if (mAlarmManager != null) {
-            PendingIntent cancelIntent = PendingIntent.getBroadcast(context, alarmId, notifyIntent, 0);
-            mAlarmManager.cancel(cancelIntent);
-            cancelIntent.cancel();
-        }
     }
 
     /** Listeners */

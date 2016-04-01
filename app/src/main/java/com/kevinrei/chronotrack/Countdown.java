@@ -86,7 +86,7 @@ public class Countdown {
                 if (millisUntilFinished >= SECOND) {
                     value = millisUntilFinished / SECOND;
                     if (value == 1) {
-                        trigger.append(millisUntilFinished / SECOND).append( "second" );
+                        trigger.append(millisUntilFinished / SECOND).append( " second " );
                     } else {
                         trigger.append(millisUntilFinished / SECOND).append(" seconds ");
                     }

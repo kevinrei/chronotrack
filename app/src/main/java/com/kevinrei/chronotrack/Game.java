@@ -1,9 +1,8 @@
 package com.kevinrei.chronotrack;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.io.Serializable;
 
-public class Game implements Parcelable {
+public class Game implements Serializable {
     private int id;
     private String title;
     private String image;
@@ -53,43 +52,5 @@ public class Game implements Parcelable {
     public void setUnit(String unit) { this.unit = unit; }
     public void setRecoveryRate(int recoveryRate) { this.recoveryRate = recoveryRate; }
     public void setMaxStamina(int maxStamina) { this.maxStamina = maxStamina; }
-
-    public Game(Parcel source) {
-        id = source.readInt();
-        title = source.readString();
-        image = source.readString();
-        category = source.readString();
-        unit = source.readString();
-        recoveryRate = source.readInt();
-        maxStamina = source.readInt();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeString(image);
-        dest.writeString(category);
-        dest.writeString(unit);
-        dest.writeInt(recoveryRate);
-        dest.writeInt(maxStamina);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
-        @Override
-        public Alarm[] newArray(int size) {
-            return new Alarm[size];
-        }
-
-        @Override
-        public Alarm createFromParcel(Parcel source) {
-            return new Alarm(source);
-        }
-    };
 }
 

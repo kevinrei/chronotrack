@@ -349,8 +349,8 @@ public class SavedAlarmAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // cancelDeletedAlarm(v.getContext(), alarm.getAlarmId());
-                        AddAlarmActivity.cancelAlarm(alarm.getAlarmId());
+                        AlarmController controller = new AlarmController();
+                        controller.cancelAlarm(context, alarm);
                         db.deleteAlarm(alarm);
                         Snackbar.make(v,
                                 "Successfully deleted the alarm.",
