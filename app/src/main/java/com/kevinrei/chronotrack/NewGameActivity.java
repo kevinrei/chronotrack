@@ -306,7 +306,7 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     private void getExistingGameData(Intent i) {
-        Game game = (Game) i.getSerializableExtra("game");
+        Game game = i.getParcelableExtra("game");
 
         appId = game.getId();
         String appTitle = game.getTitle();

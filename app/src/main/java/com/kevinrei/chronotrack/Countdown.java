@@ -81,6 +81,7 @@ public class Countdown {
                     } else {
                         trigger.append(millisUntilFinished / MINUTE).append(" minutes ");
                     }
+                    millisUntilFinished %= MINUTE;
                 }
 
                 if (millisUntilFinished >= SECOND) {

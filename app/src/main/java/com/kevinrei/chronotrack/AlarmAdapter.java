@@ -165,6 +165,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         long value;
         long time = triggerTime;
 
+        Log.d("trigger", String.valueOf(triggerTime));
+
         if (time >= DAY) {
             value = time / DAY;
             if (value == 1) {
@@ -192,10 +194,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             } else {
                 trigger.append(time / MINUTE).append(" minutes ");
             }
+            time %= MINUTE;
         }
 
-        // Only show seconds when less than a minute
-        else if (time >= SECOND) {
+        if (time >= SECOND) {
             value = time / SECOND;
             if (value == 1) {
                 trigger.append(time / SECOND).append( "second" );

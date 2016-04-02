@@ -19,7 +19,6 @@ public class AlarmService extends WakefulIntentService {
         List<Alarm> alarms = db.getAllAlarms();
         for (Alarm alarm : alarms) {
             controller.cancelAlarm(this, alarm);
-            Log.d("cancel", "cancelled");
 
             if (alarm.getCountdown() >= System.currentTimeMillis()) {
                 controller.setAlarm(this, alarm);

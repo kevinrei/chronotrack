@@ -1,8 +1,6 @@
 package com.kevinrei.chronotrack;
 
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -106,7 +104,7 @@ public class AddAlarmActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         layoutFlag = i.getIntExtra("flag", 2);
-        game = (Game) i.getSerializableExtra("game");
+        game = i.getParcelableExtra("game");
 
         if (layoutFlag == LAYOUT_ADD_STAMINA_ALARM) {
             setContentView(R.layout.activity_add_stamina_alarm);
@@ -395,7 +393,7 @@ public class AddAlarmActivity extends AppCompatActivity {
     }
 
     private long getConditionTriggerTime() {
-        return  (Integer.parseInt(removeLeadingZero(day)) * 24 * 60 * 60 * 1000)
+        return  (long) (Integer.parseInt(removeLeadingZero(day)) * 24 * 60 * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(hour)) * 60 * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(minute)) * 60 * 1000)
                 + (Integer.parseInt(removeLeadingZero(second)) * 1000);
