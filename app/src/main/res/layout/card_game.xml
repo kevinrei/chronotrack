@@ -18,6 +18,7 @@
             android:id="@+id/card_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical" >

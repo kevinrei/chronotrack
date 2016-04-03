@@ -5,7 +5,7 @@
     style="@style/Padding" >
 
     <ExpandableListView
-        android:id="@+id/expandable_menu"
+        android:id="@+id/expandable_alarm_options"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:groupIndicator="@drawable/indicator" />

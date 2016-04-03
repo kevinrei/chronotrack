@@ -43,7 +43,6 @@ public class GameListFragment extends Fragment implements GameAdapter.OnStartDra
         rootView.setTag(TAG);
 
         db = new MySQLiteHelper(getActivity());
-
         games = db.getAllGames();
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);

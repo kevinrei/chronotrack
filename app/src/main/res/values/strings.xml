@@ -18,6 +18,9 @@
     <string name="action_add_installed">Add Installed Game</string>
     <string name="action_add_uninstalled">Add Game Not On Device</string>
 
+    <!-- About -->
+    <string name="developer">by kevinrei</string>
+
     <!-- Add New Game -->
     <string name="btn_change">Change</string>
     <string name="lbl_category">Category</string>

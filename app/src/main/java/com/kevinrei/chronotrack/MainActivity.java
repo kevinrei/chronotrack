@@ -1,11 +1,8 @@
 package com.kevinrei.chronotrack;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Typeface;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
@@ -18,19 +15,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_about) {
+            Intent i = new Intent(this, AboutActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -294,10 +288,10 @@ public class MainActivity extends AppCompatActivity {
 
         mExpandAdapter = new ExpandableListAdapter(this, gameTitles, alarmOptions);
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View view = this.getLayoutInflater().inflate(R.layout.dialog_select_game, null);
+        View view = this.getLayoutInflater().inflate(R.layout.dialog_alarm_options, null);
         mBuilder.setView(view);
 
-        mExpandView = (ExpandableListView) view.findViewById(R.id.expandable_menu);
+        mExpandView = (ExpandableListView) view.findViewById(R.id.expandable_alarm_options);
         mExpandView.setAdapter(mExpandAdapter);
 
         mBuilder.setTitle("Select Game");
@@ -312,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
         final AlertDialog mAlert = mBuilder.create();
 
-        // Listview on child click listener
+        // List view on child click listener
         mExpandView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
@@ -339,99 +333,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     /** Adapters */
-
-    public class ExpandableListAdapter extends BaseExpandableListAdapter {
-        private Context context;
-        private List<String> titles;
-        private HashMap<String, List<String>> options;
-
-        public ExpandableListAdapter(Context context, List<String> titles,
-                                     HashMap<String, List<String>> options) {
-            this.context = context;
-            this.titles = titles;
-            this.options = options;
-        }
-
-        @Override
-        public Object getChild(int listPosition, int expandedListPosition) {
-            return this.options.get(this.titles.get(listPosition))
-                    .get(expandedListPosition);
-        }
-
-        @Override
-        public long getChildId(int listPosition, int expandedListPosition) {
-            return expandedListPosition;
-        }
-
-        @Override
-        public View getChildView(int listPosition, final int expandedListPosition,
-                                 boolean isLastChild, View convertView, ViewGroup parent) {
-            final String expandedListText = (String) getChild(listPosition, expandedListPosition);
-            if (convertView == null) {
-                LayoutInflater layoutInflater = (LayoutInflater) this.context
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = layoutInflater.inflate(R.layout.list_option, null);
-            }
-            TextView expandedListTextView = (TextView) convertView
-                    .findViewById(R.id.list_option);
-            expandedListTextView.setText(expandedListText);
-            return convertView;
-        }
-
-        @Override
-        public int getChildrenCount(int listPosition) {
-            return this.options.get(this.titles.get(listPosition))
-                    .size();
-        }
-
-        @Override
-        public Object getGroup(int listPosition) {
-            return this.titles.get(listPosition);
-        }
-
-        @Override
-        public int getGroupCount() {
-            return this.titles.size();
-        }
-
-        @Override
-        public long getGroupId(int listPosition) {
-            return listPosition;
-        }
-
-        @Override
-        public View getGroupView(int listPosition, boolean isExpanded,
-                                 View convertView, ViewGroup parent) {
-            String listTitle = (String) getGroup(listPosition);
-
-            if (convertView == null) {
-                LayoutInflater layoutInflater = (LayoutInflater) this.context.
-                        getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = layoutInflater.inflate(R.layout.list_title, null);
-            }
-
-            TextView listTitleTextView = (TextView) convertView
-                    .findViewById(R.id.list_title);
-            listTitleTextView.setTypeface(null, Typeface.BOLD);
-            listTitleTextView.setText(listTitle);
-
-            if (isExpanded) {
-
-            }
-
-            return convertView;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public boolean isChildSelectable(int listPosition, int expandedListPosition) {
-            return true;
-        }
-    }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
