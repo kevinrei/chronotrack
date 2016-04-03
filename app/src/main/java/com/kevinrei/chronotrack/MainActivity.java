@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // Fab speed dial with options to add from installed apps or add a new game
+        // Floating Action Button
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -378,10 +380,6 @@ public class MainActivity extends AppCompatActivity {
                     return "Quick";
             }
             return null;
-        }
-
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
         }
     }
 }

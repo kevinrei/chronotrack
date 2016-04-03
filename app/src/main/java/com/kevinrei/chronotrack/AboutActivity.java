@@ -64,9 +64,11 @@ public class AboutActivity extends AppCompatActivity {
 
         // Headers
         headers.add("About ChronoTrack");
+        headers.add("What are the Permissions for?");
         headers.add("What is a Stamina Alarm?");
         headers.add("What is a Date & Time Alarm?");
         headers.add("What is a Condition Alarm?");
+        headers.add("What are Some Use Cases?");
         headers.add("Special Thanks");
 
         // Descriptions
@@ -78,34 +80,53 @@ public class AboutActivity extends AppCompatActivity {
                         "continue playing your game, save a timer for your favorite board games, " +
                         "and more.");
 
+        List<String> permissions = new ArrayList<>();
+        permissions.add("Internet: ");
+        permissions.add("Read external storage: ");
+        permissions.add("Receive boot completed: ");
+        permissions.add("Vibrate: ");
+        permissions.add("Wake lock: ");
+
         List<String> staminaDescription = new ArrayList<>();
         staminaDescription.add(
                 "A stamina alarm is a specific alarm for your mobile games with an energy system. " +
-                        "Set reminders to play when you have enough energy for that descend " +
-                        "dungeon, when your stamina is fully restored, etc.");
+                        "Only applicable to mobile games installed on your device."
+        );
 
         List<String> dateTimeDescription = new ArrayList<>();
         dateTimeDescription.add(
                 "A date & time alarm sends a notification to your phone at a specific date and " +
-                        "time you set.  Get reminders of when that long-awaited event starts, " +
-                        "what time that time-specific dungeon appears, etc.");
+                        "time you set.  You cannot save this type of alarm."
+        );
 
         List<String> conditionDescription = new ArrayList<>();
         conditionDescription.add(
                 "A condition alarm fires a notification in x amount of time that you set.  It\'s " +
-                        "essentially a countdown alarm.  Remind yourself of when your building " +
-                        "construction\'s done, when it\'s time to take a break from work and " +
-                        "play your games, etc.");
+                        "essentially a countdown alarm."
+        );
+
+        List<String> useCases = new ArrayList<>();
+        useCases.add("Get reminders when stamina reaches a certain point");
+        useCases.add("Take a break from work and set a reminder to resume your gameplay");
+        useCases.add("Keep track of your gameplay time");
+        useCases.add("Remind yourself of when that time-specific dungeon or event arrives");
+        useCases.add("Know when that exciting new event starts, on the dot");
+        useCases.add("Receive notifications when your buildings are complete within a game");
+        useCases.add("Get times of when your game objectives are up");
+        useCases.add("Add common board game timers to never lose track of time elapsed");
 
         List<String> specialThanks = new ArrayList<>();
         specialThanks.add(
-                "");
+                ""
+        );
 
         // Populate data
         descriptions.put(headers.get(0), aboutChronoTrack);
-        descriptions.put(headers.get(1), staminaDescription);
-        descriptions.put(headers.get(2), dateTimeDescription);
-        descriptions.put(headers.get(3), conditionDescription);
-        descriptions.put(headers.get(4), specialThanks);
+        descriptions.put(headers.get(1), permissions);
+        descriptions.put(headers.get(2), staminaDescription);
+        descriptions.put(headers.get(3), dateTimeDescription);
+        descriptions.put(headers.get(4), conditionDescription);
+        descriptions.put(headers.get(5), useCases);
+        descriptions.put(headers.get(6), specialThanks);
     }
 }

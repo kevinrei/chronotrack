@@ -21,6 +21,10 @@
     <!-- About -->
     <string name="developer">by kevinrei</string>
 
+    <!-- Settings -->
+    <string name="notification_general">General Notification</string>
+    <string name="notification_sound">Notification Sound</string>
+
     <!-- Add New Game -->
     <string name="btn_change">Change</string>
     <string name="lbl_category">Category</string>

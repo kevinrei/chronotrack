@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- LED colors -->
+    <string-array name="notification_lights">
+        <item>Blue</item>
+        <item>Green</item>
+        <item>Red</item>
+        <item>White</item>
+        <item>Yellow</item>
+    </string-array>
+
     <!-- Category -->
     <string-array name="category_array">
         <item>Mobile game</item>

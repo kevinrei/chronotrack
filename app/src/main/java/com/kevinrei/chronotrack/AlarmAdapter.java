@@ -236,6 +236,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, alarms.size());
 
+                        notifyDataSetChanged();
+
                         Snackbar.make(v,
                                 "Successfully deleted the alarm.",
                                 Snackbar.LENGTH_LONG).show();

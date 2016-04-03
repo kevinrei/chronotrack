@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/notification_general" >
+
+        <CheckBoxPreference
+            android:key="notification_vibrate"
+            android:title="Vibrate"
+            android:defaultValue="true"
+            android:summary="Uncheck to turn off marquee" />
+
+        <ListPreference
+            android:key="notification_lights"
+            android:title="Change Light Indicator"
+            android:entries="@array/notification_lights"
+            android:entryValues="@array/notification_lights"
+            android:defaultValue="Blue"
+            android:summary="Change the color of the LED indicator" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/notification_sound" >
+
+        <CheckBoxPreference
+            android:key="notification_sound"
+            android:title="Sound"
+            android:defaultValue="true"
+            android:summary="Uncheck to turn off sound" />
+
+        <RingtonePreference
+            android:key="notification_ringtone"
+            android:title="Change Alert Tone"
+            android:ringtoneType="notification"
+            android:summary="Change the alert tone of your notification" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
