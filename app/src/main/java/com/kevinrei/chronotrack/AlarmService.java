@@ -1,7 +1,6 @@
 package com.kevinrei.chronotrack;
 
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class AlarmService extends WakefulIntentService {
         MySQLiteHelper db = new MySQLiteHelper(this);
         AlarmController controller = new AlarmController();
 
-        List<Alarm> alarms = db.getAllAlarms();
+        List<Alarm> alarms = db.getAllActiveAlarms();
         for (Alarm alarm : alarms) {
             controller.cancelAlarm(this, alarm);
 

@@ -54,6 +54,8 @@ public class Game implements Parcelable {
     public void setRecoveryRate(int recoveryRate) { this.recoveryRate = recoveryRate; }
     public void setMaxStamina(int maxStamina) { this.maxStamina = maxStamina; }
 
+    /** Parcel */
+
     public Game(Parcel source) {
         id = source.readInt();
         title = source.readString();

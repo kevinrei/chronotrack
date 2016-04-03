@@ -3,7 +3,6 @@ package com.kevinrei.chronotrack;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
-import android.os.CountDownTimer;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -28,7 +27,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     private static final int DAY = 24 * HOUR;
 
     private MySQLiteHelper db;
+    private boolean isAlarmActive;
 
+    public int type;
     public static  List<Alarm> alarms;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -49,7 +50,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         }
     }
 
-    public AlarmAdapter(List<Alarm> alarms) {
+    // Type: 0 for active, 1 for game
+    public AlarmAdapter(int type, List<Alarm> alarms) {
+        this.type = type;
         this.alarms = alarms;
     }
 
@@ -58,7 +61,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.card_active_alarm, viewGroup, false);
+                .inflate(R.layout.card_alarm, viewGroup, false);
 
         return new ViewHolder(v);
     }
@@ -66,15 +69,22 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by LayoutManager)
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
+        final Context context = viewHolder.itemView.getContext();
         final Alarm alarm = alarms.get(position);
 
-        db = new MySQLiteHelper(viewHolder.itemView.getContext());
+        db = new MySQLiteHelper(context);
         Game game = db.getGame(alarm.getGameId());
 
-        // Set game icon
-        Picasso.with(viewHolder.mGameIcon.getContext())
-                .load(Uri.parse(game.getImage()))
-                .into(viewHolder.mGameIcon);
+        if (type == 0) {
+            // Set game icon
+            Picasso.with(viewHolder.mGameIcon.getContext())
+                    .load(Uri.parse(game.getImage()))
+                    .into(viewHolder.mGameIcon);
+        } else if (type == 1 && alarm.getCountdown() >= System.currentTimeMillis()) {
+            turnAlarmOn(context, viewHolder.mGameIcon);
+        } else {
+            turnAlarmOff(context, viewHolder.mGameIcon);
+        }
 
         // Alarm label
         viewHolder.mAlarmLabel.setText(alarm.getLabel());
@@ -87,10 +97,24 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         Countdown mCountdown = new Countdown(viewHolder.mTimeLeft);
         mCountdown.updateTextAndProgress(alarm);
 
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.mGameIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Alarm Item", "Alarm at position " + position + " clicked.");
+                if (type == 1) {
+                    if (isAlarmActive) {
+                        showCancelAlarmDialog(v, alarm, viewHolder.mGameIcon);
+                    } else {
+                        long newCountdown = System.currentTimeMillis() + alarm.getTrigger();
+                        db.updateAlarm(alarm, newCountdown);
+                        Log.d("new alarm", alarm.toString());
+
+                        AlarmController controller = new AlarmController();
+                        controller.setAlarm(context, db.getAlarm(alarm.getAlarmId()));
+                        turnAlarmOn(context, viewHolder.mGameIcon);
+
+                        Snackbar.make(v, "Alarm set.", Snackbar.LENGTH_LONG).show();
+                    }
+                }
             }
         });
 
@@ -110,55 +134,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
 
     /** Custom methods */
-
-    public String getRateString(String unit, int rate) {
-        String result, timeUnit, rateValueString;
-        int rateValue;
-
-        rateValue = rate / 60;
-
-        // Get the unit of time measurement
-        if (rateValue == 1) {
-            timeUnit = "minute";
-        } else if (rateValue < 60) {
-            timeUnit = " minutes";
-        } else if (rateValue == 60) {
-            rateValue /= 60;
-            timeUnit = "hour";
-        } else {
-            rateValue /= 60;
-            timeUnit = " hours";
-        }
-
-        // Remove number if it's 1 minute or 1 hour
-        if (rateValue == 1) {
-            rateValueString = "";
-        } else {
-            rateValueString = String.valueOf(rateValue);
-        }
-
-        result = "1 " + unit + " every " + rateValueString + timeUnit;
-        return result;
-    }
-
-    private static String calculateTime(long totalSeconds) {
-        if (totalSeconds == 0) {
-            return "N/A";
-        }
-
-        final int MINUTES_IN_AN_HOUR = 60;
-        final int SECONDS_IN_A_MINUTE = 60;
-
-        long totalMinutes = totalSeconds / SECONDS_IN_A_MINUTE;
-        long minutes = totalMinutes % MINUTES_IN_AN_HOUR;
-        long hours = totalMinutes / MINUTES_IN_AN_HOUR;
-
-        if (hours == 0) {
-            return minutes + " minutes";
-        }
-
-        return hours + " hours " + minutes + " minutes";
-    }
 
     private String getAlarmTriggerTime(long triggerTime) {
         StringBuilder trigger = new StringBuilder("");
@@ -209,8 +184,49 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         return trigger.toString();
     }
 
+    private void turnAlarmOn(Context context, ImageView mImageView) {
+        mImageView.setImageDrawable(context
+                .getResources().getDrawable(R.drawable.ic_alarm_on));
+        isAlarmActive = true;
+    }
+
+    private void turnAlarmOff(Context context, ImageView mImageView) {
+        mImageView.setImageDrawable(context
+                .getResources().getDrawable(R.drawable.ic_alarm_off));
+        isAlarmActive = false;
+    }
 
     /** Alert Dialogs */
+
+    private void showCancelAlarmDialog(final View v, final Alarm alarm, final ImageView mImageView) {
+        final Context context = v.getContext();
+        db = new MySQLiteHelper(context);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+
+        mBuilder.setTitle("Cancelling alarm")
+                .setMessage(R.string.cancel_confirm_alarm)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AlarmController controller = new AlarmController();
+                        controller.cancelAlarm(context, alarm);
+
+                        turnAlarmOff(context, mImageView);
+
+                        Snackbar.make(v,
+                                "Successfully cancelled the alarm.",
+                                Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .create()
+                .show();
+    }
 
     private void showDeleteDialog(final View v, final Alarm alarm, final int position) {
         final Context context = v.getContext();
@@ -242,7 +258,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                                 "Successfully deleted the alarm.",
                                 Snackbar.LENGTH_LONG).show();
 
-                        Log.d("alarms", db.getAllAlarms().toString());
+                        Log.d("alarms", db.getAllActiveAlarms().toString());
                     }
                 })
                 .create()

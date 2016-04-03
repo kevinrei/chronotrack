@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
@@ -15,14 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class GameDetailActivity extends AppCompatActivity {
 
@@ -38,15 +33,19 @@ public class GameDetailActivity extends AppCompatActivity {
     Game game;
     int gameId;
     String gameTitle;
+    String gameCategory;
     String gameUnit;
     int gameRate;
     int gameMax;
 
-    /** Widgets and Fields */
+    /** Views */
     protected View mView;
-
+    protected LinearLayout mStaminaView;
+    protected TextView mSavedAlarmsText;
     protected RecyclerView mRecyclerView;
-    protected SavedAlarmAdapter mSavedAlarmAdapter;
+
+    /** Alarm List */
+    protected AlarmAdapter mAlarmAdapter;
     protected List<Alarm> alarms;
 
     @Override
@@ -61,6 +60,7 @@ public class GameDetailActivity extends AppCompatActivity {
         game = db.getGame(gameId);
 
         gameTitle = game.getTitle();
+        gameCategory = game.getCategory();
         gameUnit = game.getUnit();
         gameRate = game.getRecoveryRate();
         gameMax = game.getMaxStamina();
@@ -77,19 +77,33 @@ public class GameDetailActivity extends AppCompatActivity {
         // Set title as app name
         toolbar.setTitle(gameTitle);
 
+        // Set up stamina view if conditions are met
+        mStaminaView = (LinearLayout) findViewById(R.id.stamina_view);
+
+        if (gameCategory.equals("Mobile game") && gameRate != 0) {
+            mStaminaView.setVisibility(View.VISIBLE);
+            setStaminaView();
+        } else {
+            mStaminaView.setVisibility(View.GONE);
+        }
+
         // Initialize the views
         mView = findViewById(R.id.main_content);
+        mSavedAlarmsText = (TextView) findViewById(R.id.lbl_saved_alarms);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_alarms);
 
         // Alarm list
-        alarms = db.getAlarmsForGame(gameId);
+        alarms = db.getSavedAlarmsForGame(gameId);
+
+        String header = "Saved Alarms for " + gameTitle;
+        mSavedAlarmsText.setText(header);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
-        mSavedAlarmAdapter = new SavedAlarmAdapter(gameId, alarms);
-        mRecyclerView.setAdapter(mSavedAlarmAdapter);
+        mAlarmAdapter = new AlarmAdapter(1, alarms);
+        mRecyclerView.setAdapter(mAlarmAdapter);
     }
 
     @Override
@@ -112,7 +126,7 @@ public class GameDetailActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_add_alarm) {
-            if (game.getCategory().equals("Mobile game") && gameRate != 0) {
+            if (gameCategory.equals("Mobile game") && gameRate != 0) {
                 showAlarmDialogWithStamina(this, game);
             } else {
                 showAlarmDialogWithoutStamina(this, game);
@@ -147,6 +161,79 @@ public class GameDetailActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
+
+
+    /** Custom methods */
+
+    private void setStaminaView() {
+        TextView mLabelMax = (TextView) findViewById(R.id.lbl_max);
+        TextView mMaxValue = (TextView) findViewById(R.id.tv_max);
+        TextView mRecoveryRate = (TextView) findViewById(R.id.tv_rcv_rate);
+        TextView mFullRecovery = (TextView) findViewById(R.id.tv_full_rcv);
+
+        // Max [unit] value:
+        String labelMax = "Max " + gameUnit + " value:";
+        mLabelMax.setText(labelMax);
+
+        // Max stamina value
+        mMaxValue.setText(String.valueOf(gameMax));
+
+        // Recovery rate
+        mRecoveryRate.setText(getRateString(gameUnit, gameRate));
+
+        // Full recovery time
+        mFullRecovery.setText(calculateTime(gameRate * gameMax));
+    }
+
+    public String getRateString(String unit, int rate) {
+        String result, timeUnit, rateValueString;
+        int rateValue;
+
+        rateValue = rate / 60;
+
+        // Get the unit of time measurement
+        if (rateValue == 1) {
+            timeUnit = "minute";
+        } else if (rateValue < 60) {
+            timeUnit = " minutes";
+        } else if (rateValue == 60) {
+            rateValue /= 60;
+            timeUnit = "hour";
+        } else {
+            rateValue /= 60;
+            timeUnit = " hours";
+        }
+
+        // Remove number if it's 1 minute or 1 hour
+        if (rateValue == 1) {
+            rateValueString = "";
+        } else {
+            rateValueString = String.valueOf(rateValue);
+        }
+
+        result = "1 " + unit + " every " + rateValueString + timeUnit;
+        return result;
+    }
+
+    private static String calculateTime(long totalSeconds) {
+        if (totalSeconds == 0) {
+            return "N/A";
+        }
+
+        final int MINUTES_IN_AN_HOUR = 60;
+        final int SECONDS_IN_A_MINUTE = 60;
+
+        long totalMinutes = totalSeconds / SECONDS_IN_A_MINUTE;
+        long minutes = totalMinutes % MINUTES_IN_AN_HOUR;
+        long hours = totalMinutes / MINUTES_IN_AN_HOUR;
+
+        if (hours == 0) {
+            return minutes + " minutes";
+        }
+
+        return hours + " hours " + minutes + " minutes";
+    }
+
 
     /** Alert Dialogs */
 

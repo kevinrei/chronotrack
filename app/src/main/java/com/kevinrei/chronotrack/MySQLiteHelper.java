@@ -318,12 +318,22 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Get the list of all alarms
-    public List<Alarm> getAllAlarms() {
+    public List<Alarm> getAllActiveAlarms() {
         List<Alarm> alarmList = new LinkedList<>();
 
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ALARMS, null, null, null, null, null, null);
+
+        // Build the query
+        Cursor cursor = db.query(TABLE_ALARMS,                  // table
+                COLUMNS_ALARMS,                                 // column names
+                " countdown >= ? ",                             // selections
+                new String[]{ String.valueOf(
+                        System.currentTimeMillis()) },          // selection arguments
+                null,                                           // group by
+                null,                                           // having
+                null,                                           // order by
+                null);                                          // limit
 
         // Go over each row, build the row and add it to the list
         Alarm alarm;
@@ -357,21 +367,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Get the list of all alarms
-    public List<Alarm> getAlarmsForGame(int gameId) {
+    public List<Alarm> getSavedAlarmsForGame(int gameId) {
         List<Alarm> alarmList = new LinkedList<>();
 
         // Get reference to a readable database
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Build the query
-        Cursor cursor = db.query(TABLE_ALARMS,              // table
-                COLUMNS_ALARMS,                             // column names
-                " gameId = ?",                              // selections
-                new String[] { String.valueOf(gameId) },    // selection arguments
-                null,                                       // group by
-                null,                                       // having
-                null,                                       // order by
-                null);                                      // limit
+        Cursor cursor = db.query(TABLE_ALARMS,                  // table
+                COLUMNS_ALARMS,                                 // column names
+                " gameId = ? AND save = ? ",                    // selections
+                new String[] {String.valueOf(gameId), "1"},     // selection arguments
+                null,                                           // group by
+                null,                                           // having
+                null,                                           // order by
+                null);                                          // limit
 
         // Go over each row, build the row and add it to the list
         Alarm alarm;
@@ -405,27 +415,20 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Update the alarm details
-    public void updateAlarm(Alarm alarm, int alarmId) {
+    public void updateAlarm(Alarm alarm, long countdown) {
         // Get reference to a writable database
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_ALARM_ID, alarm.getAlarmId());
-        values.put(KEY_GAME_ID, alarm.getGameId());
-        values.put(KEY_FLAG, alarm.getFlag());
-        values.put(KEY_START, alarm.getStart());
-        values.put(KEY_END, alarm.getEnd());
-        values.put(KEY_TRIGGER, alarm.getTrigger());
-        values.put(KEY_COUNTDOWN, alarm.getCountdown());
-        values.put(KEY_LABEL, alarm.getLabel());
-        values.put(KEY_SAVE, alarm.getSave());
+        values.put(KEY_COUNTDOWN, countdown);
 
         // Update the row
         db.update(TABLE_ALARMS,                             // table
                 values,                                     // values
-                KEY_ID + " = ?",                            // selections
-                new String[]{String.valueOf(alarmId)});     // selection arguments
+                KEY_ALARM_ID + " = ?",                      // selections
+                new String[]{String.valueOf(
+                        alarm.getAlarmId())});              // selection arguments
 
         // Close the database
         db.close();

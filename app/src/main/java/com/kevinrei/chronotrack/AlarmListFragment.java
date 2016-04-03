@@ -1,15 +1,12 @@
 package com.kevinrei.chronotrack;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ public class AlarmListFragment extends Fragment {
         rootView.setTag(TAG);
 
         db = new MySQLiteHelper(getActivity());
-        alarms = db.getAllAlarms();
+        alarms = db.getAllActiveAlarms();
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
 
@@ -50,7 +47,7 @@ public class AlarmListFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new SpacesItemDecoration(HORIZONTAL_MARGIN, VERTICAL_MARGIN));
 
-        mAlarmAdapter = new AlarmAdapter(alarms);
+        mAlarmAdapter = new AlarmAdapter(0, alarms);
         mRecyclerView.setAdapter(mAlarmAdapter);
 
         return rootView;
