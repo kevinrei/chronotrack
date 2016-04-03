@@ -424,7 +424,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Update the row
         db.update(TABLE_ALARMS,                             // table
                 values,                                     // values
-                KEY_ID + " = ?",                           // selections
+                KEY_ID + " = ?",                            // selections
                 new String[]{String.valueOf(alarmId)});     // selection arguments
 
         // Close the database
@@ -436,7 +436,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Delete the row
-        db.delete(TABLE_ALARMS, KEY_ID + " = ?", new String[]{String.valueOf(alarm.getId())});
+        db.delete(TABLE_ALARMS, KEY_ALARM_ID + "=" + alarm.getAlarmId(), null);
 
         // Close the database
         db.close();

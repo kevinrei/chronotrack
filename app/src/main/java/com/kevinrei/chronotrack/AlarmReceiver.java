@@ -28,18 +28,17 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Based on user preference
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        MySQLiteHelper db = new MySQLiteHelper(context);
 
         // Build the notification
-        mBuilder.setContentIntent(getPendingIntent(context, alarm.getAlarmId()));
-        mBuilder.setContentTitle("ChronoTrack");
+        mBuilder.setContentIntent(getPendingIntent(context, alarm));
+        mBuilder.setContentTitle(db.getGame(alarm.getGameId()).getTitle() + " alarm triggered!");
         mBuilder.setContentText(alarm.getLabel());
         mBuilder.setLights(Color.BLUE, 3000, 3000);
         mBuilder.setSmallIcon(R.mipmap.ic_launcher);
         mBuilder.setSound(uri);
-        mBuilder.setTicker("ChronoTrack alarm triggered!");
+        mBuilder.setTicker("ChronoTrack alarm triggered");
         mBuilder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
         mBuilder.setWhen(System.currentTimeMillis());
 
@@ -47,8 +46,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         mNotificationManager.notify(alarm.getId(), mNotification);
     }
 
-    PendingIntent getPendingIntent(Context context, int alarmId) {
-        Intent i = new Intent(context, AlarmReceiver.class).putExtra("alarm_id", alarmId);
-        return PendingIntent.getBroadcast(context, alarmId, i, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent getPendingIntent(Context context, Alarm alarm) {
+        Intent i = new Intent(context, AlarmReceiver.class).putExtra("alarm", alarm);
+        return PendingIntent.getBroadcast(context, alarm.getAlarmId(), i,
+                PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

@@ -28,8 +28,8 @@ public class AlarmController {
         PendingIntent pi = getPendingIntent(context, alarm);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        am.cancel(pi);
         pi.cancel();
+        am.cancel(pi);
     }
 
     PendingIntent getPendingIntent(Context context, Alarm alarm) {

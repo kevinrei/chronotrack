@@ -15,6 +15,9 @@ public class Countdown {
 
     private TextView mText;
     private CountDownTimer mCountdown;
+    private Alarm alarm;
+
+    public Countdown(Alarm alarm) { }
 
     public Countdown(TextView mText) {
         this.mText = mText;

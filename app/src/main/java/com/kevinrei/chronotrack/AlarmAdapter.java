@@ -239,6 +239,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                         Snackbar.make(v,
                                 "Successfully deleted the alarm.",
                                 Snackbar.LENGTH_LONG).show();
+
+                        Log.d("alarms", db.getAllAlarms().toString());
                     }
                 })
                 .create()

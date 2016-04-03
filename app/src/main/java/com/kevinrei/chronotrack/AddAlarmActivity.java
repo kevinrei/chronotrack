@@ -89,14 +89,13 @@ public class AddAlarmActivity extends AppCompatActivity {
     protected ImageButton mBack;
 
     int position = 7;
-    String day;
-    String hour;
-    String minute;
-    String second;
+    String day = "00";
+    String hour = "00";
+    String minute = "00";
+    String second = "00";
 
     /** Alarm variables */
     public static Context context;
-    public static Intent notifyIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +134,7 @@ public class AddAlarmActivity extends AppCompatActivity {
             }
         }
 
+        mAlarmLabel = (EditText) findViewById(R.id.alarm_label);
         mCheckSave = (CheckBox) findViewById(R.id.cb_save);
         Log.d("layout_flag", String.valueOf(layoutFlag));
     }
@@ -196,8 +196,18 @@ public class AddAlarmActivity extends AppCompatActivity {
 
             else if (layoutFlag == LAYOUT_ADD_CONDITION_ALARM) {
                 alarmTriggerTime = getConditionTriggerTime();
+
+                if (alarmTriggerTime == 0) {
+                    Snackbar.make(mView, "Please enter time.",
+                            Snackbar.LENGTH_LONG).show();
+                    return false;
+                }
+
                 saveAfter = mCheckSave.isChecked();
             }
+
+            Log.d("editText", mAlarmLabel.getText().toString());
+            Log.d("isEmpty", String.valueOf(isEmpty(mAlarmLabel)));
 
             if (isEmpty(mAlarmLabel)) {
                 alarmLabel = "Label";
